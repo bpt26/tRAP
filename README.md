@@ -18,7 +18,7 @@ You can download tRNAscan-SE at http://lowelab.ucsc.edu/tRNAscan-SE/. You can al
 
 ### Graphical Overview:
 
-<img src='classifierPipelineNew.png' alt='classifier pipeline' width='800'/>
+<img src='classifierPipelineNew.png' alt='classifier pipeline' width='910'/>
 
 Here is a general guide to the program in the listed order. All commands ending in .py are custom programs that can be found in this repository. The rest are either functions of HAL, PHAST or tRNAscan-SE:
 
