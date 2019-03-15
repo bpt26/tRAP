@@ -59,14 +59,14 @@ Here is a general guide to the program in the listed order. All commands ending 
 ##### 16: use data generated in previous steps to classify each tRNA as active or inactive:
 
 ### <a name="what"></a>What's in this repository:
-- makeHiConfBed.py -- creates 3 .bed files of high-confidence tRNA genes, with 0-, 50- and 250-base padding on either side
-- getMFE.py -- uses tRNAscan-SE secondary structure file and converts to a form usable by RNAfold. Also produces bash script `tRNAfold.sh` that will call RNAfold on this same file.
-- tRNAFasta.py -- takes in a bed file and genome-wide .fa file and outputs the sequence in .fa format corresponding to the bed file.
-- gff2bed.py -- converts .gff file to .bed format.
-- reduce4d.py -- converts bed file output by hal4dExtract to a bed containing only the 4d sites of 100,000 randomly distributed exons.
-- splitMAF.py -- splits genome-wide .maf into separate files by chromosome. Also creates bash scripts `tRNAPhastCons.sh` and `tRNAPhyloP.sh` to be called to get phastCons elements and PhyloP scores for tRNA loci, respectively.
-- humanTrainingData.tsv -- tRNA data derived from these methods performed on the hg38 genome.
-- humanTrainingLabels.tsv -- active and inactive states for each tRNA derived from epigenomic data.
-- classifytRNAs.py -- gathers PhyloP scores, tRNAscan-SE bit scores, MFE, CpG content, distance to protein-coding genes for each tRNA gene, and uses analogous data and labels from human data to predict activity states for each tRNA in the genome of interest. Outputs tRNAPredictions.out, which contains the name of each tRNA, its predicted activity, and the probability scores as determined by sklearn.
+- `makeHiConfBed.py` -- creates 3 .bed files of high-confidence tRNA genes, with 0-, 50- and 250-base padding on either side
+- `getMFE.py` -- uses tRNAscan-SE secondary structure file and converts to a form usable by RNAfold. Also produces bash script `tRNAfold.sh` that will call RNAfold on this same file.
+- `tRNAFasta.py` -- takes in a bed file and genome-wide .fa file and outputs the sequence in .fa format corresponding to the bed file.
+- `gff2bed.py` -- converts .gff file to .bed format.
+- `reduce4d.py` -- converts bed file output by hal4dExtract to a bed containing only the 4d sites of 100,000 randomly distributed exons.
+- `splitMAF.py` -- splits genome-wide .maf into separate files by chromosome. Also creates bash scripts `tRNAPhastCons.sh` and `tRNAPhyloP.sh` to be called to get phastCons elements and PhyloP scores for tRNA loci, respectively.
+- `humanTrainingData.tsv` -- tRNA data derived from these methods performed on the hg38 genome.
+- `humanTrainingLabels.tsv` -- active and inactive states for each tRNA derived from epigenomic data.
+- `classifytRNAs.py` -- gathers PhyloP scores, tRNAscan-SE bit scores, MFE, CpG content, distance to protein-coding genes for each tRNA gene, and uses analogous data and labels from human data to predict activity states for each tRNA in the genome of interest. Outputs tRNAPredictions.out, which contains the name of each tRNA, its predicted activity, and the probability scores as determined by sklearn.
 
 
