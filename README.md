@@ -12,19 +12,29 @@ By the time you are ready to run the script that makes the actual classification
 - RNAfold output showing the minimum free energy for each tRNA gene
 - .bed file containing the locations of annotated protein coding genes in your genome of interest
 
-To run from start to finish, the only dependencies are tRNAscan-SE, HAL and PHAST, and PHAST is itself a dependency of HAL. These instructions for HAL are thorough and should work for most systems: https://github.com/ComparativeGenomicsToolkit/hal
+To run from start to finish, the dependencies are tRNAscan-SE, HAL and PHAST. These instructions for HAL and PHAST are thorough and should work for most systems: https://github.com/ComparativeGenomicsToolkit/hal
 
-You can download tRNAscan-SE at http://lowelab.ucsc.edu/tRNAscan-SE/. You can also download the necessary data directly from http://gtrnadb.ucsc.edu.
+You can download tRNAscan-SE at http://lowelab.ucsc.edu/tRNAscan-SE/. You can also download the necessary data directly from http://gtrnadb.ucsc.edu. You can download RNAfold here: https://github.com/ViennaRNA/ViennaRNA.
 
 ### Graphical Overview:
 
-<img src='classifierPipelineNew.png' alt='classifier pipeline' width='680'/>
+<img src='classifierPipelineNew.png' alt='classifier pipeline' width='800'/>
 
 Here is a general guide to the program in the listed order. All commands ending in .py are custom programs that can be found in this repository. The rest are either functions of HAL, PHAST or tRNAscan-SE:
 
-`hal2fasta /path/to/hal-file species-name > genome.fa # 1
-tRNAscan-SE genome.fa -o tRNA.out -f tRNA.ss -s tRNA.iso -m tRNA.stats -b tRNA.bed -a tRNA.fa -H -y --detail # 2
-EukHighConfidenceFilter -r -i tRNA.out -s tRNA.ss -p tRNA_hiConf -o /path/to/desired/output/ # 2
-python makeHiConfBed.py tRNA_hiConf.out tRNA.bed # 3`
+##### 1: extract genome from HAL alignment
+`hal2fasta /path/to/hal-file species-name > genome.fa`
+##### 2: use tRNAscan-SE 2.0 to find and annotate tRNA genes, and filter out pseudogenes and low-confidence genes
+`tRNAscan-SE genome.fa -o tRNA.out -f tRNA.ss -s tRNA.iso -m tRNA.stats -b tRNA.bed -a tRNA.fa -H -y --detail`
+`EukHighConfidenceFilter -r -i tRNA.out -s tRNA.ss -p tRNA_hiConf -o /path/to/desired/output/`
+##### 3: use python script to make a bed file containing only high-confidence tRNA genes with 0-, 50-, and 250-base flanking regions
+`python makeHiConfBed.py tRNA_hiConf.out tRNA.bed`
+##### 4: create an input file to be analyzed by RNAfold:
+`python getMFE.py tRNA_hiConf.ss tRNA_hiConf.bed`
+##### 5: run RNAfold to determine MFE for each tRNA gene:
+`chmod u+x tRNAfold.sh
+./tRNAfold.sh`
+
+
 
 
