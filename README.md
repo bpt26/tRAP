@@ -34,7 +34,20 @@ Here is a general guide to the program in the listed order. All commands ending 
 ##### 5: run RNAfold to determine MFE for each tRNA gene:
 `chmod u+x tRNAfold.sh`
 `./tRNAfold.sh`
+##### 6: create a .fa file containing the tRNA gene and its 250 flanks on either side (recommended: include file with chromosome lengths):
+`python tRNAFasta.py tRNA_hiConf_250.bed genome.fa (chromosome_lengths.txt)`
 
+##### 7: convert .gff annotation file to .bed:
+##### 8: find four-fold degenerate sites to be used as neutral regions to train PhyloP model:
+##### 9: (optional, recommended for large genomes) subsample down to the 4d sites of 100,000 exons to speed up PhyloP training process:
+##### 10: convert 4d .bed file to .maf format:
+##### 11: use PhyloFit to train model and produce .mod file:
 
+##### 12: convert tRNA genes and 50-base flanking regions to .maf format:
+##### 13: split .maf by chromosome for handling by PhyloP and create phastCons and PhyloP command files:
+##### 14: run phastCons to find tRNAs with extended conserved flanking regions:
+##### 15: run PhyloP to produce .wig file encompassing all tRNAs and flanking regions:
+
+##### 16: use data generated in previous steps to classify each tRNA as active or inactive:
 
 
