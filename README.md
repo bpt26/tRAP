@@ -32,8 +32,8 @@ Here is a general guide to the program in the listed order. All commands ending 
 ##### 4: create an input file to be analyzed by RNAfold:
 `python getMFE.py tRNA_hiConf.ss tRNA_hiConf.bed`
 ##### 5: run RNAfold to determine MFE for each tRNA gene:
-`chmod u+x tRNAfold.sh
-./tRNAfold.sh`
+`chmod u+x tRNAfold.sh`
+`./tRNAfold.sh`
 
 
 
