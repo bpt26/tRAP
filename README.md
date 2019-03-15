@@ -21,6 +21,7 @@ You can download tRNAscan-SE at http://lowelab.ucsc.edu/tRNAscan-SE/. You can al
 - [Graphical Overview](#overview)
 - [Step-by-step Guide](#guide)
 - [What's in this repository](#what)
+- [Contact](#contact)
 
 ### <a name="overview"></a>Graphical Overview:
 
@@ -69,4 +70,6 @@ Here is a general guide to the program in the listed order. All commands ending 
 - `humanTrainingLabels.tsv` -- active and inactive states for each tRNA derived from epigenomic data.
 - `classifytRNAs.py` -- gathers PhyloP scores, tRNAscan-SE bit scores, MFE, CpG content, distance to protein-coding genes for each tRNA gene, and uses analogous data and labels from human data to predict activity states for each tRNA in the genome of interest. Outputs tRNAPredictions.out, which contains the name of each tRNA, its predicted activity, and the probability scores as determined by sklearn.
 
+### <a name="contact"></a>Contact:
 
+Please direct all questions to bthornlo@ucsc.edu.
