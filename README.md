@@ -39,10 +39,9 @@ Here is a general guide to the program in the listed order. All commands ending 
 ##### 3: use python script to make a bed file containing only high-confidence tRNA genes with 0-, 50-, and 250-base flanking regions (recommended: include file with chromosome lengths)
 `python makeHiConfBed.py -i tRNA_hiConf.out -b tRNA.bed (-l chromosome_lengths.txt) -o tRNAHiConf.bed`
 ##### 4: create an input file to be analyzed by RNAfold:
-`python getMFE.py tRNA_hiConf.ss tRNA_hiConf.bed`
+`python getMFE.py -s tRNA_hiConf.ss -b tRNA_hiConf.bed -o tRNAFoldIn.txt`
 ##### 5: run RNAfold to determine MFE for each tRNA gene:
-`chmod u+x tRNAfold.sh`
-`./tRNAfold.sh`
+`RNAfold --noPS -C < tRNAFoldIn.txt > tRNA.mfe`
 ##### 6: create a .fa file containing the tRNA gene and its 250 flanks on either side:
 `python tRNAFasta.py -b tRNA_hiConf_250.bed -g genome.fa`
 
@@ -84,7 +83,7 @@ Here is a general guide to the program in the listed order. All commands ending 
 - `makeHiConfBed.py` -- creates 3 .bed files of high-confidence tRNA genes, with 0-, 50- and 250-base padding on either side
 - `getMFE.py` -- uses tRNAscan-SE secondary structure file and converts to a form usable by RNAfold. Also produces bash script `tRNAfold.sh` that will call RNAfold on this same file.
 - `tRNAFasta.py` -- takes in a bed file and genome-wide .fa file and outputs the sequence in .fa format corresponding to the bed file.
-- `gff2bed.py` -- converts .gff file to .bed format.
+- `gff2bed.py` -- converts .gff file to .bed format containing only exons.
 - `reduce4d.py` -- converts .bed file output by hal4dExtract to a .bed containing only the 4d sites of 100,000 randomly distributed exons.
 - `splitBed.py` -- splits .bed file by chromosome, and also creates a shell script that will convert all of the resulting .beds into .mafs, and shell scripts to turn those .mafs into a .wig file and a phastCons elements text file.
 
