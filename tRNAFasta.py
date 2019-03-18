@@ -51,7 +51,6 @@ class fileConverter(object):
         self.inputGenomeSeq = inputGenomeSeq
         self.outputFile = outputFile
 
-
     def convertFile(self):
         chromTotRNACoords = {}
         for line in open(self.inputBed):
@@ -131,16 +130,19 @@ def main(myCommandLine=None):
     """
     myCommandLine = CommandLine()
 
-    if myCommandLine.args.inputFile:
-        inputFile = myCommandLine.args.inputFile
+    if myCommandLine.args.inputBed:
+        inputBed = myCommandLine.args.inputBed
+
+    if myCommandLine.args.inputGenomeSeq:
+        inputGenomeSeq = myCommandLine.args.inputGenomeSeq
 
     if myCommandLine.args.outputFile:
         outputFile = myCommandLine.args.outputFile
 
     if len(myCommandLine.args.outputFile) == 0:
-        outputFile = inputFile.split('.')[0]+'.bed'
+        outputFile = inputBed.split('.')[0]+'.fa'
 
-    myFileConverter = fileConverter(inputFile, outputFile)
+    myFileConverter = fileConverter(inputBed, inputGenomeSeq, outputFile)
     myFileConverter.convertFile()
 
 if __name__ == "__main__":

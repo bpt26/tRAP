@@ -31,65 +31,47 @@ Here is a general guide to the program in the listed order. All commands ending 
 
 ### <a name="guide"></a>Step-by-step Guide:
 
-##### 1: extract genome from HAL alignment
+##### 1: convert .gff annotation file to .bed:
+`python gff2bed.py -i annotation.gff -o /out/path/filename`
+##### 2: find four-fold degenerate sites to be used as neutral regions to train PhyloP model:
+`hal4dExtract /path/to/hal-file species-name annotation.bed /out/path/filename`
+##### 3: (optional, recommended for large genomes) subsample down to the 4d sites of 100,000 exons to speed up PhyloP training process:
+`python reduce4d.py -i 4d.bed -n num-exons-to-keep -o /out/path/filename`
+##### 4: convert 4d .bed file to .maf format:
+`hal2mafMP.py --numProc 10 --refGenome species-name --refTargets 4dreduced.bed /path/to/hal-file /out/path/filename`
+`cat /out/path/filename-from-previous-step* > 4dreduced.maf`
+##### 5: use PhyloFit to train model and produce .mod file:
+`phyloFit --EM --tree newick-tree-from-hal-file --msa-format MAF --precision MED --subst-mod REV --out-root /out/path/filename 4dreduced.maf`
+
+##### 6: extract genome from HAL alignment
 `hal2fasta /path/to/hal-file species-name > genome.fa`
-##### 2: use tRNAscan-SE 2.0 to find and annotate tRNA genes, and filter out pseudogenes and low-confidence genes
+##### 7: use tRNAscan-SE 2.0 to find and annotate tRNA genes, and filter out pseudogenes and low-confidence genes
 `tRNAscan-SE genome.fa -o tRNA.out -f tRNA.ss -s tRNA.iso -m tRNA.stats -b tRNA.bed -a tRNA.fa -H -y --detail`
-`EukHighConfidenceFilter -r -i tRNA.out -s tRNA.ss -p tRNA_hiConf -o /path/to/desired/output/`
-##### 3: use python script to make a bed file containing only high-confidence tRNA genes with 0-, 50-, and 250-base flanking regions (recommended: include file with chromosome lengths)
-`python makeHiConfBed.py -i tRNA_hiConf.out -b tRNA.bed (-l chromosome_lengths.txt) -o tRNAHiConf.bed`
-##### 4: create an input file to be analyzed by RNAfold:
-`python getMFE.py -s tRNA_hiConf.ss -b tRNA_hiConf.bed -o tRNAFoldIn.txt`
-##### 5: run RNAfold to determine MFE for each tRNA gene:
-`RNAfold --noPS -C < tRNAFoldIn.txt > tRNA.mfe`
-##### 6: create a .fa file containing the tRNA gene and its 250 flanks on either side:
-`python tRNAFasta.py -b tRNA_hiConf_250.bed -g genome.fa`
+`EukHighConfidenceFilter -r -i tRNA.out -s tRNA.ss -p tRNA_hiConf -o /out/path/filename`
+##### 8: create .bed files of high-confidence tRNAs, .fa of tRNA genes and flanking regions, and shell script to create and analyze data:
+`python makeHiConfBed.py -i tRNA_hiConf.out -b tRNA.bed -s species-name -c /path/to/cactus/graph -m /mod/file/from/step-5 (-l chromosome_lengths.txt) -o /out/path/filename`
 
-##### 7: convert .gff annotation file to .bed:
-`python gff2bed.py -i annotation.gff -o annotation.bed`
-##### 8: find four-fold degenerate sites to be used as neutral regions to train PhyloP model:
-`hal4dExtract /path/to/hal-file species-name annotation.bed /path/to/desired/output`
-##### 9: (optional, recommended for large genomes) subsample down to the 4d sites of 100,000 exons to speed up PhyloP training process:
-`python reduce4d.py -i 4d.bed -n num-exons-to-keep -o /path/to/desired/output`
-##### 10: convert 4d .bed file to .maf format:
-`hal2mafMP.py --numProc 10 --refGenome species-name --refTargets 4dreduced.bed /path/to/hal-file /path/to/desired/output/prefix`
-`cat /path/to/desired/output/prefix-from-previous-step* > 4dreduced.maf`
-##### 11: use PhyloFit to train model and produce .mod file:
-`phyloFit --EM --tree newick-tree-from-hal-file --msa-format MAF --precision MED --subst-mod REV --out-root /path/to/desired/output/prefix 4dreduced.maf`
+##### 9: create a .fa file containing the tRNA gene and its 250 flanks on either side:
+`python tRNAFasta.py -b tRNA_hiConf_250.bed -g genome.fa -o /out/path/filename`
+##### 10: create an input file to be analyzed by RNAfold:
+`python getMFE.py -s tRNA_hiConf.ss -b tRNA_hiConf.bed -o /out/path/filename`
+##### 11: run RNAfold to determine MFE for each tRNA gene:
+`RNAfold --noPS -C < /out/from/step-10.txt > tRNA.mfe`
 
-##### new: split bed into separate chromosomes for handling by PhyloP and PhastCons:
-`python splitBed.py -i input-bed -o /path/to/output/shell-script-name.sh`
-##### new: convert .beds into .mafs:
-`chmod u+x /path/to/output/shell-script-name.sh` `./path/to/output/shell-script-name.sh`
+##### 12: run hal2maf, phyloP and phastCons to get data for classification:
+`./species-name-getAlign.sh (generated in step 8)`
 
-##### 14: run phastCons to find tRNAs with extended conserved flanking regions:
-`chmod u+x runPhastCons.sh` `./runPhastCons.sh`
-##### 15: run PhyloP to produce .wig file encompassing all tRNAs and flanking regions:
-`chmod u+x runPhyloP.sh` `./runPhyloP.sh`
-##### 16: use data generated in previous steps to classify each tRNA as active or inactive:
-`python classifytRNAs.py -b tRNA_hiConf.bed -c phastConsElements.bed -w tRNA.wig -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -g gff.bed (-l chromosome_lengths.txt) -o tRNAPredictions.out`
+##### 13: classify tRNA genes using data created earlier in the pipeline and human training data:
+`python classifytRNAs.py -b tRNA_hiConf.bed --b2 tRNA_hiConf_250.bed -c phastConsElements.txt -w tRNA.wig -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -g gff.bed -l chrom_lengths.txt -o /out/path/filename`
 
-###### OLD:
-
-##### 12: convert tRNA genes and 50-base flanking regions to .maf format -- not gonna do it this way anymore:
-##### 13: split .maf by chromosome for handling by PhyloP and create phastCons and PhyloP command files -- not doing this either:
-
-##### 14: run phastCons to find tRNAs with extended conserved flanking regions:
-##### 15: run PhyloP to produce .wig file encompassing all tRNAs and flanking regions:
-
-##### 16: use data generated in previous steps to classify each tRNA as active or inactive:
 
 ### <a name="what"></a>What's in this repository:
-- `makeHiConfBed.py` -- creates 3 .bed files of high-confidence tRNA genes, with 0-, 50- and 250-base padding on either side
+- `makeHiConfBed.py` -- creates 3 .bed files of high-confidence tRNA genes, with 0-, 50- and 250-base padding on either side, and a shell script that will convert these to MAFs and then to PhyloP scores and PhastCons elements
 - `getMFE.py` -- uses tRNAscan-SE secondary structure file and converts to a form usable by RNAfold. Also produces bash script `tRNAfold.sh` that will call RNAfold on this same file.
 - `tRNAFasta.py` -- takes in a bed file and genome-wide .fa file and outputs the sequence in .fa format corresponding to the bed file.
 - `gff2bed.py` -- converts .gff file to .bed format containing only exons.
 - `reduce4d.py` -- converts .bed file output by hal4dExtract to a .bed containing only the 4d sites of 100,000 randomly distributed exons.
-- `splitBed.py` -- splits .bed file by chromosome, and also creates a shell script that will convert all of the resulting .beds into .mafs, and shell scripts to turn those .mafs into a .wig file and a phastCons elements text file.
-
-- `splitMAF.py` -- splits genome-wide .maf into separate files by chromosome. Also creates bash scripts `tRNAPhastCons.sh` and `tRNAPhyloP.sh` to be called to get phastCons elements and PhyloP scores for tRNA loci, respectively.
 - `humanTrainingData.tsv` -- tRNA data derived from these methods performed on the hg38 genome.
-- `humanTrainingLabels.tsv` -- active and inactive states for each tRNA derived from epigenomic data.
 - `classifytRNAs.py` -- gathers PhyloP scores, tRNAscan-SE bit scores, MFE, CpG content, distance to protein-coding genes for each tRNA gene, and uses analogous data and labels from human data to predict activity states for each tRNA in the genome of interest. Outputs tRNAPredictions.out, which contains the name of each tRNA, its predicted activity, and the probability scores as determined by sklearn.
 
 ### <a name="contact"></a>Contact:

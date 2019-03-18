@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Name: Bryan Thornlow
 # Date: 6/6/2017
-# getMFE.py
+# makeHiConfBeds.py
 
 import sys
 import os
@@ -77,7 +77,7 @@ class fileConverter(object):
         if len(self.chromLengths) > 0:
             for line in open(self.chromLengths):
                 splitLine = (line.strip()).split('\t')
-                if len(splitLine) > 0:
+                if len(splitLine) > 2:
                     chromToLengths[str(splitLine[0])] = int(splitLine[2])
 
         myOutString = ''
@@ -109,13 +109,14 @@ class fileConverter(object):
 
         myCommands = '#!/bin/bash\n#$ -cwd\n#$ -j y\n#$ -S /bin/bash\n\n'
         for chrom in sorted(chromToOut.keys()):
-            myCommands += 'rm *Temp*\nhal2mafMP.py --numProc 10 --refGenome '+self.speciesName+' --refTargets '+chrom+'.bed '
+            myCommands += 'rm *temp*\nrm *Temp*\nhal2mafMP.py --numProc 10 --refGenome '+self.speciesName+' --refTargets '+chrom+'.bed '
             myCommands += self.cactusPath+' '+chrom+'\ncat *'+chrom+'*hal2mafTemp* > '+chrom+'.maf\n'
             myCommands += 'phyloP --msa-format MAF --method LRT --wig-scores --mode CONACC --no-prune '+self.modFile
             myCommands += ' '+chrom+'.maf > '+chrom+'.wig\nphastCons '+chrom+'.maf '+self.modFile+' --msa-format MAF --viterbi '
             myCommands += chrom+'_phastCons.bed --score\n\n'
-        open(self.speciesName+'getAlign.sh', 'w').write(myCommands+'cat *.wig > '+self.speciesName+'.wig\ncat *phastCons.bed > ')
-        open(self.speciesName+'getAlign.sh', 'a').write(self.speciesName+'_elements.bed\n')
+            open(chrom+'.bed', 'w').write(''.join(chromToOut[chrom]))
+        open(self.outPath+'GetAlign.sh', 'w').write(myCommands+'cat *.wig > '+self.speciesName+'.wig\ncat *phastCons.bed > ')
+        open(self.outPath+'GetAlign.sh', 'a').write(self.speciesName+'_elements.bed\n')
 
 
 def joiner(entry):
@@ -189,7 +190,7 @@ def main(myCommandLine=None):
         outPath = myCommandLine.args.outPath
 
     myFileConverter = fileConverter(hiConfOut, bedFile, speciesName, cactusPath, modFile, chromLengths, outPath)
-    myFileConverter.convertFile()
+    myFileConverter.makeHiConfBeds()
 
 if __name__ == "__main__":
     """
