@@ -12,7 +12,10 @@ import gzip
 import math
 
 """
-This program converts a .gff or .gff.gz file into a .bed file.
+This program converts creates a file to be analyzed by RNAfold.
+To do so, plug the file output by this program into this command:
+
+RNAfold --noPS -C < (output from this script) > tRNA.mfe
 """
 
 import sys, argparse, random, math
