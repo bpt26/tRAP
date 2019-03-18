@@ -107,16 +107,17 @@ class fileConverter(object):
         open(self.outPath+'50.bed', 'w').write(myOutString50)
         open(self.outPath+'250.bed', 'w').write(myOutString250)
 
-        myCommands = '#!/bin/bash\n#$ -cwd\n#$ -j y\n#$ -S /bin/bash\n\n'
+        myCommands = '#!/bin/bash\n#$ -cwd\n#$ -j y\n#$ -S /bin/bash\n\nmkdir chromWigs\nmkdir chromElements\n'
         for chrom in sorted(chromToOut.keys()):
-            myCommands += 'rm *temp*\nrm *Temp*\nhal2mafMP.py --numProc 10 --refGenome '+self.speciesName+' --refTargets '+chrom+'.bed '
-            myCommands += self.cactusPath+' '+chrom+'\ncat *'+chrom+'*hal2mafTemp* > '+chrom+'.maf\n'
+            # unfortunately haven't found a way around just running as 
+            myCommands += 'rm *temp*\nrm *Temp*\nhal2maf --refGenome '+self.speciesName
+            myCommands += ' --refTargets '+chrom+'.bed '+self.cactusPath+' '+chrom+'.maf\n'
             myCommands += 'phyloP --msa-format MAF --method LRT --wig-scores --mode CONACC --no-prune '+self.modFile
-            myCommands += ' '+chrom+'.maf > '+chrom+'.wig\nphastCons '+chrom+'.maf '+self.modFile+' --msa-format MAF --viterbi '
-            myCommands += chrom+'_phastCons.bed --score\n\n'
+            myCommands += ' '+chrom+'.maf > chromWigs/'+chrom+'.wig\nphastCons '+chrom+'.maf '+self.modFile+' --msa-format MAF --viterbi '
+            myCommands += 'chromElements/'+chrom+'_phastCons.bed --score\n\n'
             open(chrom+'.bed', 'w').write(''.join(chromToOut[chrom]))
-        open(self.outPath+'GetAlign.sh', 'w').write(myCommands+'cat *.wig > '+self.speciesName+'.wig\ncat *phastCons.bed > ')
-        open(self.outPath+'GetAlign.sh', 'a').write(self.speciesName+'_elements.bed\n')
+        open('getAlign.sh', 'w').write(myCommands+'cat chromWigs/*.wig > '+self.speciesName+'.wig\ncat chromElements/*phastCons.bed > ')
+        open('getAlign.sh', 'a').write(self.speciesName+'_elements.bed\n')
 
 
 def joiner(entry):

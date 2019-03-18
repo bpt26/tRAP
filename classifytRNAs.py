@@ -10,12 +10,17 @@ import random
 import numpy
 import gzip
 import math
+import argparse
+import sklearn
+import numpy as np
+from sklearn.impute import SimpleImputer
+from sklearn.datasets import make_classification
+from sklearn.ensemble import RandomForestClassifier
 
 """
 This program classifies tRNAs using a random forest classifier.
 """
 
-import sys, argparse, random, math
 
 class CommandLine(object):
     """Handles the input arguments from the command line. Manages 
@@ -34,7 +39,7 @@ class CommandLine(object):
         self.parser = argparse.ArgumentParser()
         self.parser.add_argument("-b", "--inputBed", help="Input .bed"+
             " containing genomic coordinates of all high-confidence tRNA genes.")
-        self.parser.add_argument("--b2", "--inputBed250", help="Input .bed containing genomic coordinates of"+
+        self.parser.add_argument("-e", "--inputBedExt", help="Input .bed containing genomic coordinates of"+
             " all high-confidence tRNA genes and 250 bases upstream and downstream where possible.")
         self.parser.add_argument("-c", "--phastConsElements", help="PhastCons elements"+
             " found in or near high-confidence tRNA genes.")
@@ -56,9 +61,9 @@ class CommandLine(object):
 
 class fileConverter(object):
 
-    def __init__(self, inputBed, inputBed250, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, outputFile):
+    def __init__(self, inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, outputFile):
         self.inputBed = inputBed
-        self.inputBed250 = inputBed250
+        self.inputBedExt = inputBedExt
         self.phastConsElements = phastConsElements
         self.inputWig = inputWig
         self.inputOut = inputOut
@@ -180,7 +185,7 @@ class fileConverter(object):
         #########################
         #########################
 
-        sys.stderr.write("Getting PhyloP features...")
+        sys.stderr.write("Getting PhyloP features...\n")
 
         coordToPhyloP = {}
         for line in open(self.inputWig):
@@ -239,15 +244,14 @@ class fileConverter(object):
         ######################
         ######################
 
-        sys.stderr.write("Getting bit score features...")
+        sys.stderr.write("Getting bit score features...\n")
 
         tRNAToGenBit = {}
         for line in open(self.inputOut):
-            splitLine = (line.strip()).split('\t')
+            splitLine = (line.strip()).split()
             if not (splitLine[0]).strip() in ['Sequence', 'Name', '--------']:
-                if splitLine[0]+'__'+str(splitLine[2]) in coordTotRNA:
-                    if splitLine[0]+'__'+str(splitLine[2]) in coordTotRNA:
-                        mytRNA = coordTotRNA[splitLine[0]+'__'+str(splitLine[2])]
+                if splitLine[0]+'__'+str(min(int(splitLine[2]),int(splitLine[3]))+25) in coordTotRNA:
+                    mytRNA = coordTotRNA[splitLine[0]+'__'+str(min(int(splitLine[2]),int(splitLine[3]))+25)]
                     if not mytRNA in myHaltRNAs:
                         mytRNA = myNameMap[mytRNA]
                     tRNAToGenBit[mytRNA] = float(splitLine[8])
@@ -283,7 +287,7 @@ class fileConverter(object):
         ########################
         ########################
 
-        sys.stderr.write("Getting sequence features...")
+        sys.stderr.write("Getting sequence features...\n")
 
         tRNAToFasta = {}
         tRNAToCpGOvrPct = {}
@@ -294,7 +298,7 @@ class fileConverter(object):
         tRNAToUpstreamDist = {}
         tRNAToDownstreamDist = {}
 
-        for line in open(self.inputBed250):
+        for line in open(self.inputBedExt):
             splitLine = (line.strip()).split('\t')
             myChrom = splitLine[0]
             mytRNA = splitLine[3]
@@ -394,8 +398,9 @@ class fileConverter(object):
         reducedSetDicts = [tRNATotRNAPhyloPAvg,tRNATo5PhyloPAvg,tRNAToCpGOvrPct,tRNAToObsExp]
         reducedSetDicts += [tRNAToObsExpUp,tRNAToGenBit,tRNATotRNA10kb,tRNAToProt75kb,tRNAToTTTT,tRNAToCodon,tRNAToMFE]
 
-        myOutString = 'tRNA'+joiner(reducedSet)
+        myOutString = 'tRNA\t'+joiner(reducedSet)+'\n'
         for tRNA in myHaltRNAs:
+            myOutString += tRNA
             for diction in reducedSetDicts:
                 if not tRNA in diction:
                     diction[tRNA] = '?'
@@ -415,11 +420,7 @@ class fileConverter(object):
         imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
         for line in open('humanTrainingSet.tsv'):
             splitLine = (line.strip()).split('\t')
-            if (splitLine[0]) == 'tRNA':
-                myHeader = []
-                for k in splitLine[1:]:
-                    myHeader.append(labelsDict[k])
-            else:
+            if (splitLine[0]) != 'tRNA':
                 myHumanData.append(makeFloat(splitLine[1:-1]))
                 myHumanNames.append(splitLine[0])
                 if str(splitLine[-1]) == 'active':
@@ -430,29 +431,26 @@ class fileConverter(object):
         imp_mean.fit_transform(myHumanData)
         myHumanDataReplaced = imp_mean.transform(myHumanData)
 
+        clf = RandomForestClassifier(n_estimators=1000, max_depth=5, random_state=3, oob_score=True, n_jobs=8, min_samples_split=2)
+        clf.fit(myHumanDataReplaced, myLabels)
+
         myTestData = []
         myTestLabels = []
         myTestNames = []
         imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
         for line in open('alltRNAData.tsv'):
             splitLine = (line.strip()).split('\t')
-            if (splitLine[0]) == 'tRNA':
-                myTestHeader = splitLine
-            else:
+            if (splitLine[0]) != 'tRNA':
                 myTestData.append(makeFloat(splitLine[1:-1]))
                 myTestNames.append(splitLine[0])
-                if str(splitLine[-1]) in ['active', '1']:
-                    myTestLabels.append(1)
-                elif str(splitLine[-1]) == ['inactive', '0']:
-                    myTestLabels.append(0)
 
         imp_mean.fit_transform(myTestData)
         myTestDataReplaced = imp_mean.transform(myTestData)
-
-        clf = RandomForestClassifier(n_estimators=1000, max_depth=5, random_state=3, oob_score=True, n_jobs=8, min_samples_split=2)
-        clf.fit(myHumanDataReplaced, myLabels)
-        testPred = clf.predict_proba(myTestDataReplaced)
-        print(testPred)
+        myScores = clf.predict_proba(myTestDataReplaced)
+        myOutString = ''
+        for i in range(0,len(myScores)):
+            myOutString += myTestNames[i]+'\t'+getProb(myScores[i])+'\n'
+        open(self.outputFile, 'w').write(myOutString)
 
 def joiner(entry):
     newList = []
@@ -474,6 +472,22 @@ def convertToFloat(entry):
             myReturn += str(entry)[i]
     return(float(myReturn))
 
+def makeFloat(myList):
+    myReturn = []
+    for k in myList:
+        if not k == '?' and not 'tRNA' in k:
+            myReturn.append(float(k))
+        elif k == '?':
+            myReturn.append(np.nan)
+        else:
+            myReturn.append(k)
+    return(myReturn)
+
+def getProb(myScores):
+    if float(myScores[0]) > float(myScores[1]):
+        return('-'+str(myScores[0])+'\t'+'inactive')
+    else:
+        return(str(myScores[1])+'\t'+'active')
 
 def main(myCommandLine=None):
     """
@@ -483,6 +497,8 @@ def main(myCommandLine=None):
     myCommandLine = CommandLine()
     if myCommandLine.args.inputBed:
         inputBed = myCommandLine.args.inputBed
+    if myCommandLine.args.inputBedExt:
+        inputBedExt = myCommandLine.args.inputBedExt
     if myCommandLine.args.phastConsElements:
         phastConsElements = myCommandLine.args.phastConsElements
     if myCommandLine.args.inputWig:
@@ -500,7 +516,7 @@ def main(myCommandLine=None):
     if myCommandLine.args.outputFile:
         outputFile = myCommandLine.args.outputFile
 
-    myFileConverter = fileConverter(inputBed, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, outputFile)
+    myFileConverter = fileConverter(inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, outputFile)
     myFileConverter.getFeatures()
 
 if __name__ == "__main__":
