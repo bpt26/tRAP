@@ -55,13 +55,14 @@ class CommandLine(object):
             " annotated in the genome of interest.")
         self.parser.add_argument("-l", "--chromLengths", help="Optional but recommended: File containing lengths"+
             " for all chromosomes in genome of interest (each line should be chrom<tab>0<tab>length<end>.", default='')
+        self.parser.add_argument("-d", "--trainingFile", help="File containing human data for training the classifier.", default='')
         self.parser.add_argument("-o", "--outputFile", help="The path to"+
             " and the filename of the output predictions file you are creating.", default='')
         self.args = self.parser.parse_args()
 
 class fileConverter(object):
 
-    def __init__(self, inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, outputFile):
+    def __init__(self, inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, trainingFile, outputFile):
         self.inputBed = inputBed
         self.inputBedExt = inputBedExt
         self.phastConsElements = phastConsElements
@@ -71,6 +72,7 @@ class fileConverter(object):
         self.inputFa = inputFa
         self.inputGFF = inputGFF
         self.chromLengths = chromLengths
+        self.trainingFile = trainingFile
         self.outputFile = outputFile
 
     def getFeatures(self):
@@ -101,6 +103,10 @@ class fileConverter(object):
         for line in open(self.phastConsElements):
             splitLine = (line.strip()).split('\t')
             myChrom = splitLine[0]
+            if not myChrom in chromToLen:
+                for i in range(1,10):
+                    if myChrom+'.'+str(i) in chromTotRNAs: 
+                        myChrom = myChrom+'.'+str(i)
             myStart = int(splitLine[1])
             myEnd = int(splitLine[2])
             myScore = int(splitLine[4])
@@ -192,6 +198,10 @@ class fileConverter(object):
             splitLine = (line.strip()).split()
             if (line.strip()).startswith('fixedStep'):
                 myChrom = (splitLine[1]).split('=')[-1]
+                if not myChrom in chromTotRNAs:
+                    for i in range(1,10):
+                        if myChrom+'.'+str(i) in chromTotRNAs: 
+                            myChrom = myChrom+'.'+str(i)
                 myStart = int((splitLine[2]).split('=')[-1])
                 lineCounter = 0
             else:
@@ -418,7 +428,7 @@ class fileConverter(object):
         myLabels = []
         myHumanNames = []
         imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
-        for line in open('humanTrainingSet.tsv'):
+        for line in open(self.trainingFile):
             splitLine = (line.strip()).split('\t')
             if (splitLine[0]) != 'tRNA':
                 myHumanData.append(makeFloat(splitLine[1:-1]))
@@ -513,10 +523,12 @@ def main(myCommandLine=None):
         inputGFF = myCommandLine.args.inputGFF
     if myCommandLine.args.chromLengths:
         chromLengths = myCommandLine.args.chromLengths
+    if myCommandLine.args.trainingFile:
+        trainingFile = myCommandLine.args.trainingFile
     if myCommandLine.args.outputFile:
         outputFile = myCommandLine.args.outputFile
 
-    myFileConverter = fileConverter(inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, outputFile)
+    myFileConverter = fileConverter(inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, trainingFile, outputFile)
     myFileConverter.getFeatures()
 
 if __name__ == "__main__":
