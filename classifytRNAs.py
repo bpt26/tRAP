@@ -527,6 +527,8 @@ def main(myCommandLine=None):
         trainingFile = myCommandLine.args.trainingFile
     if myCommandLine.args.outputFile:
         outputFile = myCommandLine.args.outputFile
+    if len(outputFile) == 0:
+        outputFile = inputOut.split('.')[0]+'tRNAClassifications.txt'
 
     myFileConverter = fileConverter(inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, trainingFile, outputFile)
     myFileConverter.getFeatures()
