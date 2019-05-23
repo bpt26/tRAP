@@ -75,7 +75,7 @@ You might be wondering what to do if you have no Cactus graph, or annotation for
 `tRNAscan-SE genome.fa -o tRNA.out -f tRNA.ss -s tRNA.iso -m tRNA.stats -b tRNA.bed -a tRNA.fa -H -y --detail`
 `EukHighConfidenceFilter -r -i tRNA.out -s tRNA.ss -p tRNA_hiConf -o /out/path/filename`
 ##### 2: create .bed files of high-confidence tRNAs, .fa of tRNA genes and flanking regions, and shell script to create and analyze data:
-`python makeHiConfBed.py -i tRNA_hiConf.out -b tRNA.bed -s species-name -c  -m (-l chromosome_lengths.txt) -o /out/path/filename`
+`python makeHiConfBed.py -i tRNA_hiConf.out -b tRNA.bed (-l chromosome_lengths.txt) -o /out/path/filename`
 
 ##### 3: create a .fa file containing the tRNA gene and its 250 flanks on either side:
 `python tRNAFasta.py -b tRNA_hiConf_250.bed -g genome.fa -o /out/path/filename`

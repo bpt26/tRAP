@@ -40,11 +40,11 @@ class CommandLine(object):
         self.parser.add_argument("-b", "--bedFile", help="Input .bed"+
             " of all tRNAs from tRNAscan-SE 2.0.")
         self.parser.add_argument("-s", "--speciesName", help="Name of species"+
-            " of interest as it appears in the Cactus graph.")
+            " of interest as it appears in the Cactus graph.", default='')
         self.parser.add_argument("-c", "--cactusPath", help="Path to Cactus "+
-            " graph or .hal file.")
+            " graph or .hal file.", default='')
         self.parser.add_argument("-m", "--modFile", help="Path to .mod "+
-            " file that will be used to train the PhyloP and PhastCons models.")
+            " file that will be used to train the PhyloP and PhastCons models.", default='')
         self.parser.add_argument("-l", "--chromLengths", help="File containing"+
             " length of each chromosome corresponding to this genome.", default='')
         self.parser.add_argument("-o", "--outPath", help="Path to your desired"+
@@ -177,15 +177,23 @@ def main(myCommandLine=None):
 
     if myCommandLine.args.speciesName:
         speciesName = myCommandLine.args.speciesName
+    else:
+        speciesName = ''
 
     if myCommandLine.args.cactusPath:
         cactusPath = myCommandLine.args.cactusPath
+    else:
+        cactusPath = ''
 
     if myCommandLine.args.modFile:
         modFile = myCommandLine.args.modFile
+    else:
+        modFile = ''
 
     if myCommandLine.args.chromLengths:
         chromLengths = myCommandLine.args.chromLengths
+    else:
+        chromLengths = ''
 
     if myCommandLine.args.outPath:
         outPath = myCommandLine.args.outPath
