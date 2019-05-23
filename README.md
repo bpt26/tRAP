@@ -20,6 +20,7 @@ You can download tRNAscan-SE at http://lowelab.ucsc.edu/tRNAscan-SE/. You can al
 
 - [Graphical Overview](#overview)
 - [Step-by-step Guide](#guide)
+- [Simplified Version](#simplified)
 - [What's in this repository](#what)
 - [Contact](#contact)
 
@@ -62,7 +63,29 @@ Here is a general guide to the program in the listed order. All commands ending 
 `./species-name-getAlign.sh (generated in step 8)`
 
 ##### 13: classify tRNA genes using data created earlier in the pipeline and human training data:
-`python classifytRNAs.py -b tRNA_hiConf.bed --b2 tRNA_hiConf_250.bed -c phastConsElements.txt -w tRNA.wig -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -g gff.bed -l chrom_lengths.txt -o /out/path/filename`
+`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_250.bed -c phastConsElements.txt -w tRNA.wig -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -g gff.bed -l chrom_lengths.txt -d human_training_data.tsv -o /out/path/tRNAClassifications.out`
+
+### <a name="guide"></a>Simplified Version:
+
+You might be wondering what to do if you have no Cactus graph, or annotation for your tRNA gene set of interest. To handle this case, we have introduced a simplified version of the pipeline. Here, you would just do steps 7, 8, 9, 10, 11 and 13 from above. For simplicity, this version is outlined below:
+
+<img src='classifierPipelineSimplified.png' alt='simplified classifier pipeline' width='910'/>
+
+##### 1: use tRNAscan-SE 2.0 to find and annotate tRNA genes, and filter out pseudogenes and low-confidence genes
+`tRNAscan-SE genome.fa -o tRNA.out -f tRNA.ss -s tRNA.iso -m tRNA.stats -b tRNA.bed -a tRNA.fa -H -y --detail`
+`EukHighConfidenceFilter -r -i tRNA.out -s tRNA.ss -p tRNA_hiConf -o /out/path/filename`
+##### 2: create .bed files of high-confidence tRNAs, .fa of tRNA genes and flanking regions, and shell script to create and analyze data:
+`python makeHiConfBed.py -i tRNA_hiConf.out -b tRNA.bed -s species-name -c /path/to/cactus/graph -m /mod/file/from/step-5 (-l chromosome_lengths.txt) -o /out/path/filename`
+
+##### 3: create a .fa file containing the tRNA gene and its 250 flanks on either side:
+`python tRNAFasta.py -b tRNA_hiConf_250.bed -g genome.fa -o /out/path/filename`
+##### 4: create an input file to be analyzed by RNAfold:
+`python getMFE.py -s tRNA_hiConf.ss -b tRNA_hiConf.bed -o /out/path/filename`
+##### 5: run RNAfold to determine MFE for each tRNA gene:
+`RNAfold --noPS -C < /out/from/step-10.txt > tRNA.mfe`
+
+##### 13: classify tRNA genes using simplified flag (-x) and alternate training data set.:
+`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_250.bed -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -l chrom_lengths.txt -d human_simplified_training_data.tsv -o /out/path/tRNAClassifications.out -x`
 
 
 ### <a name="what"></a>What's in this repository:

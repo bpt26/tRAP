@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Name: Bryan Thornlow
-# Date: 6/6/2017
-# gffToBed.py
+# Date: 2/1/2019
+# classifytRNAs.py
 
 import sys
 import os
@@ -56,13 +56,21 @@ class CommandLine(object):
         self.parser.add_argument("-l", "--chromLengths", help="Optional but recommended: File containing lengths"+
             " for all chromosomes in genome of interest (each line should be chrom<tab>0<tab>length<end>.", default='')
         self.parser.add_argument("-d", "--trainingFile", help="File containing human data for training the classifier.", default='')
+        self.parser.add_argument("-a", "--activityFile", help="File containing activity data for each tRNA gene.", default='')
+        self.parser.add_argument("-s", "--segDups", help="List of segmental duplications to exclude from prediction.", default='')
         self.parser.add_argument("-o", "--outputFile", help="The path to"+
             " and the filename of the output predictions file you are creating.", default='')
+        self.parser.add_argument("-x", "--simplified", help="Flag for using the simplified (no annotation- or "+
+            "alignment-based features.", default=False)
+        if inOpts is None:
+            self.args = vars(self.parser.parse_args())
+        else:
+            self.args = vars(self.parser.parse_args(inOpts))
         self.args = self.parser.parse_args()
 
 class fileConverter(object):
 
-    def __init__(self, inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, trainingFile, outputFile):
+    def __init__(self, inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, trainingFile, activityFile, segDups, outputFile, simplified):
         self.inputBed = inputBed
         self.inputBedExt = inputBedExt
         self.phastConsElements = phastConsElements
@@ -73,7 +81,10 @@ class fileConverter(object):
         self.inputGFF = inputGFF
         self.chromLengths = chromLengths
         self.trainingFile = trainingFile
+        self.activityFile = activityFile
+        self.segDups = segDups
         self.outputFile = outputFile
+        self.simplified = simplified
 
     def getFeatures(self):
 
@@ -103,7 +114,7 @@ class fileConverter(object):
         for line in open(self.phastConsElements):
             splitLine = (line.strip()).split('\t')
             myChrom = splitLine[0]
-            if not myChrom in chromToLen:
+            if len(chromToLen) != 0 and not myChrom in chromToLen:
                 for i in range(1,10):
                     if myChrom+'.'+str(i) in chromTotRNAs: 
                         myChrom = myChrom+'.'+str(i)
@@ -157,13 +168,14 @@ class fileConverter(object):
                     coordToSprinzl[myChrom+'__'+str(myStart)] = 1
                     (tRNAToCoords[mytRNA]).append(myChrom+'__'+str(myStart))
                     myStart -= 1
+
             if myChrom+'__'+str(myEnd) in coordToCons:
-                while (myChrom+'__'+str(myEnd) in coordToCons and myEnd+20 < chromToLen[myChrom]):
-                    coordTotRNA[myChrom+'__'+str(myEnd)] = mytRNA
-                    coordToSprinzl[myChrom+'__'+str(myEnd)] = 1
-                    (tRNAToCoords[mytRNA]).append(myChrom+'__'+str(myEnd))
-                    myEnd += 1
-                    
+                if myChrom in chromToLen:
+                    while (myChrom+'__'+str(myEnd) in coordToCons and myEnd+20 < chromToLen[myChrom]):
+                        coordTotRNA[myChrom+'__'+str(myEnd)] = mytRNA
+                        coordToSprinzl[myChrom+'__'+str(myEnd)] = 1
+                        (tRNAToCoords[mytRNA]).append(myChrom+'__'+str(myEnd))
+                        myEnd += 1
 
             if myStrand == '+':
                 for k in range(myStart-20, myStart):
@@ -191,62 +203,63 @@ class fileConverter(object):
         #########################
         #########################
 
-        sys.stderr.write("Getting PhyloP features...\n")
+        if self.simplified == False:
+            sys.stderr.write("Getting PhyloP features...\n")
 
-        coordToPhyloP = {}
-        for line in open(self.inputWig):
-            splitLine = (line.strip()).split()
-            if (line.strip()).startswith('fixedStep'):
-                myChrom = (splitLine[1]).split('=')[-1]
-                if not myChrom in chromTotRNAs:
-                    for i in range(1,10):
-                        if myChrom+'.'+str(i) in chromTotRNAs: 
-                            myChrom = myChrom+'.'+str(i)
-                myStart = int((splitLine[2]).split('=')[-1])
-                lineCounter = 0
-            else:
-                myCoord = myChrom+'__'+str(myStart+lineCounter)
-                coordToPhyloP[myCoord] = float(splitLine[0])
-                lineCounter += 1
+            coordToPhyloP = {}
+            for line in open(self.inputWig):
+                splitLine = (line.strip()).split()
+                if (line.strip()).startswith('fixedStep'):
+                    myChrom = (splitLine[1]).split('=')[-1]
+                    if not myChrom in chromTotRNAs:
+                        for i in range(1,10):
+                            if myChrom+'.'+str(i) in chromTotRNAs: 
+                                myChrom = myChrom+'.'+str(i)
+                    myStart = int((splitLine[2]).split('=')[-1])
+                    lineCounter = 0
+                else:
+                    myCoord = myChrom+'__'+str(myStart+lineCounter)
+                    coordToPhyloP[myCoord] = float(splitLine[0])
+                    lineCounter += 1
 
-        tRNATotRNAPhyloPAvg = {}
-        tRNATotRNAPhyloPAlign = {}
-        tRNATo3PhyloPAvg = {}
-        tRNATo3PhyloPAlign = {}
-        tRNATo5PhyloPAvg = {}
-        tRNATo5PhyloPAlign = {}
+            tRNATotRNAPhyloPAvg = {}
+            tRNATotRNAPhyloPAlign = {}
+            tRNATo3PhyloPAvg = {}
+            tRNATo3PhyloPAlign = {}
+            tRNATo5PhyloPAvg = {}
+            tRNATo5PhyloPAlign = {}
 
-        for tRNA in tRNAToCoords:
-            my5Val = 0.0
-            my5Count = 0.0
-            my3Val = 0.0
-            my3Count = 0.0
-            mytRNAVal = 0.0
-            mytRNACount = 0.0
-            for coord in tRNAToCoords[tRNA]:
-                mySprinzl = coordToSprinzl[coord]
-                if coord in coordToPhyloP:
-                    if mySprinzl == 5:
-                        my5Count += 1
-                        my5Val += coordToPhyloP[coord]
+            for tRNA in tRNAToCoords:
+                my5Val = 0.0
+                my5Count = 0.0
+                my3Val = 0.0
+                my3Count = 0.0
+                mytRNAVal = 0.0
+                mytRNACount = 0.0
+                for coord in tRNAToCoords[tRNA]:
+                    mySprinzl = coordToSprinzl[coord]
+                    if coord in coordToPhyloP:
+                        if mySprinzl == 5:
+                            my5Count += 1
+                            my5Val += coordToPhyloP[coord]
 
-                    elif mySprinzl == 3:
-                        my3Count += 1
-                        my3Val += coordToPhyloP[coord]
+                        elif mySprinzl == 3:
+                            my3Count += 1
+                            my3Val += coordToPhyloP[coord]
 
-                    elif mySprinzl == 1:
-                        mytRNACount += 1
-                        mytRNAVal += coordToPhyloP[coord]
+                        elif mySprinzl == 1:
+                            mytRNACount += 1
+                            mytRNAVal += coordToPhyloP[coord]
 
-            if mytRNACount > 0:
-                tRNATotRNAPhyloPAvg[tRNA] = mytRNAVal/mytRNACount
-            tRNATotRNAPhyloPAlign[tRNA] = mytRNACount
-            if my5Count > 0:
-                tRNATo5PhyloPAvg[tRNA] = my5Val/my5Count
-            tRNATo5PhyloPAlign[tRNA] = my5Count
-            if my3Count > 0:
-                tRNATo3PhyloPAvg[tRNA] = my3Val/my3Count
-            tRNATo3PhyloPAlign[tRNA] = my3Count
+                if mytRNACount > 0:
+                    tRNATotRNAPhyloPAvg[tRNA] = mytRNAVal/mytRNACount
+                tRNATotRNAPhyloPAlign[tRNA] = mytRNACount
+                if my5Count > 0:
+                    tRNATo5PhyloPAvg[tRNA] = my5Val/my5Count
+                tRNATo5PhyloPAlign[tRNA] = my5Count
+                if my3Count > 0:
+                    tRNATo3PhyloPAvg[tRNA] = my3Val/my3Count
+                tRNATo3PhyloPAlign[tRNA] = my3Count
 
         ######################
         ######################
@@ -303,6 +316,7 @@ class fileConverter(object):
         tRNAToCpGOvrPct = {}
         tRNAToObsExp = {}
         tRNAToObsExpUp = {}
+        tRNAToObsExpDown = {}
         tRNAToTTTT = {}
 
         tRNAToUpstreamDist = {}
@@ -314,8 +328,12 @@ class fileConverter(object):
             mytRNA = splitLine[3]
             myStart = int(tRNAToStart[mytRNA].split('__')[-1])
             myEnd = int(tRNAToEnd[mytRNA].split('__')[-1])
-            tRNAToUpstreamDist[mytRNA] = myStart-int(splitLine[1])
-            tRNAToDownstreamDist[mytRNA] = int(splitLine[2])-myEnd
+            if splitLine[5] == '+':
+                tRNAToUpstreamDist[mytRNA] = myStart-int(splitLine[1])
+                tRNAToDownstreamDist[mytRNA] = int(splitLine[2])-myEnd
+            else:
+                tRNAToDownstreamDist[mytRNA] = myStart-int(splitLine[1])
+                tRNAToUpstreamDist[mytRNA] = int(splitLine[2])-myEnd
 
         for line in open(self.inputFa):
             splitLine = (line.strip()).split('\t')
@@ -333,11 +351,17 @@ class fileConverter(object):
                 tRNAToObsExpUp[mytRNA] = (myUp.count('CG')*float(len(myUp))) / (float(myUp.count('C'))*float(myUp.count('G')))
             else:
                 tRNAToObsExpUp[mytRNA] = 0.0
+
+            if (float(myDown.count('C'))*float(myDown.count('G'))) > 0:
+                tRNAToObsExpDown[mytRNA] = (myDown.count('CG')*float(len(myDown))) / (float(myDown.count('C'))*float(myDown.count('G')))
+            else:
+                tRNAToObsExpDown[mytRNA] = 0.0
             
             if 'TTTT' in myDown:
                 tRNAToTTTT[mytRNA] = myDown.index('TTTT')
             else:
                 tRNAToTTTT[mytRNA] = 251
+
 
         ##################################
         ##################################
@@ -356,33 +380,34 @@ class fileConverter(object):
         tRNATotRNA10kb = {}
         tRNAToProt75kb = {}
 
-        for line in open(self.inputGFF):
-            splitLine = (line.strip()).split('\t')
-            myChrom = splitLine[0].split('.')[0]
-            myExon = str(splitLine[3])
-            if not myChrom in chromToExonCoords:
-                chromToExonCoords[myChrom] = [int(splitLine[1]), int(splitLine[2])]
-            else:
-                (chromToExonCoords[myChrom]).append(int(splitLine[1]))
-                (chromToExonCoords[myChrom]).append(int(splitLine[2]))
-            coordToExon[myChrom+'__'+str(splitLine[1])] = myExon
-            coordToExon[myChrom+'__'+str(splitLine[2])] = myExon
-
-        for myChrom in chromTotRNAs:
-            for mytRNA in chromTotRNAs[myChrom]:
-                if myChrom in chromToExonCoords:
-                    myExons75kb = set()
-                    myStart = int(tRNAToStart[mytRNA].split('__')[1])
-                    myEnd = int(tRNAToEnd[mytRNA].split('__')[1])
-                    (chromTotRNACoords[myChrom]).append(myStart)
-                    (chromTotRNACoords[myChrom]).append(myEnd)
-                    for exonCoord in chromToExonCoords[myChrom]:
-                        if min(abs(myStart-exonCoord), abs(myEnd-exonCoord)) > 10:
-                            if min(abs(myStart-exonCoord), abs(myEnd-exonCoord)) <= 75000:
-                                myExons75kb.add(coordToExon[myChrom+'__'+str(exonCoord)])
-                    tRNAToProt75kb[mytRNA] = len(myExons75kb)
+        if self.simplified == False:
+            for line in open(self.inputGFF):
+                splitLine = (line.strip()).split('\t')
+                myChrom = splitLine[0]
+                myExon = str(splitLine[3])
+                if not myChrom in chromToExonCoords:
+                    chromToExonCoords[myChrom] = [int(splitLine[1]), int(splitLine[2])]
                 else:
-                    tRNAToProt75kb[mytRNA] = 0
+                    (chromToExonCoords[myChrom]).append(int(splitLine[1]))
+                    (chromToExonCoords[myChrom]).append(int(splitLine[2]))
+                coordToExon[myChrom+'__'+str(splitLine[1])] = myExon
+                coordToExon[myChrom+'__'+str(splitLine[2])] = myExon
+
+            for myChrom in chromTotRNAs:
+                for mytRNA in chromTotRNAs[myChrom]:
+                    if myChrom in chromToExonCoords:
+                        myExons75kb = set()
+                        myStart = int(tRNAToStart[mytRNA].split('__')[1])
+                        myEnd = int(tRNAToEnd[mytRNA].split('__')[1])
+                        (chromTotRNACoords[myChrom]).append(myStart)
+                        (chromTotRNACoords[myChrom]).append(myEnd)
+                        for exonCoord in chromToExonCoords[myChrom]:
+                            if min(abs(myStart-exonCoord), abs(myEnd-exonCoord)) > 10:
+                                if min(abs(myStart-exonCoord), abs(myEnd-exonCoord)) <= 75000:
+                                    myExons75kb.add(coordToExon[myChrom+'__'+str(exonCoord)])
+                        tRNAToProt75kb[mytRNA] = len(myExons75kb)
+                    else:
+                        tRNAToProt75kb[mytRNA] = 0
 
         for myChrom in chromTotRNAs:
             for mytRNA in chromTotRNAs[myChrom]:
@@ -402,21 +427,44 @@ class fileConverter(object):
         ############################
         ############################
 
-        reducedSet = ['tRNAPhyloPAvg','5PhyloPAvg']
-        reducedSet += ['CpGOvrPct','ObsExp','ObsExpUp','GenBit','tRNA10kb']
-        reducedSet += ['Prot75kb','TTTT','Codon','MFE']
-        reducedSetDicts = [tRNATotRNAPhyloPAvg,tRNATo5PhyloPAvg,tRNAToCpGOvrPct,tRNAToObsExp]
-        reducedSetDicts += [tRNAToObsExpUp,tRNAToGenBit,tRNATotRNA10kb,tRNAToProt75kb,tRNAToTTTT,tRNAToCodon,tRNAToMFE]
+        if self.simplified == False:
+            reducedSet = ['tRNAPhyloPAvg','5PhyloPAvg']
+            reducedSet += ['CpGDensity','ObsExpUp','GenBit','tRNA10kb']
+            reducedSet += ['Prot75kb','TTTT','Codon','MFE']
+            reducedSetDicts = [tRNATotRNAPhyloPAvg,tRNATo5PhyloPAvg,tRNAToCpGOvrPct]
+            reducedSetDicts += [tRNAToObsExpUp,tRNAToGenBit,tRNATotRNA10kb,tRNAToProt75kb,tRNAToTTTT,tRNAToCodon,tRNAToMFE]
+        else:
+            reducedSet += ['CpGDensity','ObsExpUp','GenBit','tRNA10kb','TTTT','Codon','MFE']
+            reducedSetDicts = [tRNAToCpGOvrPct,tRNAToObsExpUp,tRNAToGenBit,tRNATotRNA10kb,tRNAToProt75kb,tRNAToTTTT,tRNAToCodon,tRNAToMFE]
+
+        tRNAToActivity = {}
+        if len(self.activityFile) > 0:
+            for line in open(self.activityFile):
+                splitLine = (line.strip()).split()
+                if str(splitLine[1]) in ['1', 'active']:
+                    tRNAToActivity[splitLine[0]] = '1'
+                elif str(splitLine[1]) in ['0', 'inactive']:
+                    tRNAToActivity[splitLine[0]] = '0'
+        else:
+            for tRNA in myHaltRNAs:
+                tRNAToActivity[tRNA] = '0'
+
+        tRNAToSegDups = {}
+        if len(self.segDups) > 0:
+            for line in open(self.segDups):
+                tRNAToSegDups[line.strip()] = True
 
         myOutString = 'tRNA\t'+joiner(reducedSet)+'\n'
         for tRNA in myHaltRNAs:
-            myOutString += tRNA
-            for diction in reducedSetDicts:
-                if not tRNA in diction:
-                    diction[tRNA] = '?'
-                myOutString += '\t'+str(diction[tRNA])
-            myOutString += '\t0\n'
-        open('alltRNAData.tsv', 'w').write(myOutString)
+            if tRNA in tRNAToActivity:
+                if not tRNA in tRNAToSegDups:
+                    myOutString += tRNA
+                    for diction in reducedSetDicts:
+                        if not tRNA in diction:
+                            diction[tRNA] = '?'
+                        myOutString += '\t'+str(diction[tRNA])
+                    myOutString += '\t'+tRNAToActivity[tRNA]+'\n'
+        open('alltRNADataCpG.tsv', 'w').write(myOutString)
 
         ###########################
         ###########################
@@ -433,22 +481,22 @@ class fileConverter(object):
             if (splitLine[0]) != 'tRNA':
                 myHumanData.append(makeFloat(splitLine[1:-1]))
                 myHumanNames.append(splitLine[0])
-                if str(splitLine[-1]) == 'active':
+                if str(splitLine[-1]) in ['active', '1']:
                     myLabels.append(1)
-                elif str(splitLine[-1]) == 'inactive':
+                elif str(splitLine[-1]) in ['inactive', '0']:
                     myLabels.append(0)
 
         imp_mean.fit_transform(myHumanData)
         myHumanDataReplaced = imp_mean.transform(myHumanData)
 
-        clf = RandomForestClassifier(n_estimators=1000, max_depth=5, random_state=3, oob_score=True, n_jobs=8, min_samples_split=2)
+        clf = RandomForestClassifier(n_estimators=250, max_depth=4, random_state=49, oob_score=True, n_jobs=8, min_samples_split=2)
         clf.fit(myHumanDataReplaced, myLabels)
 
         myTestData = []
         myTestLabels = []
         myTestNames = []
         imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
-        for line in open('alltRNAData.tsv'):
+        for line in open('alltRNADataCpG.tsv'):
             splitLine = (line.strip()).split('\t')
             if (splitLine[0]) != 'tRNA':
                 myTestData.append(makeFloat(splitLine[1:-1]))
@@ -505,32 +553,66 @@ def main(myCommandLine=None):
     arguments into a new fileConverter object and calls main method.
     """
     myCommandLine = CommandLine()
+
+    # Necessary files:
     if myCommandLine.args.inputBed:
         inputBed = myCommandLine.args.inputBed
     if myCommandLine.args.inputBedExt:
         inputBedExt = myCommandLine.args.inputBedExt
-    if myCommandLine.args.phastConsElements:
-        phastConsElements = myCommandLine.args.phastConsElements
-    if myCommandLine.args.inputWig:
-        inputWig = myCommandLine.args.inputWig
     if myCommandLine.args.inputOut:
         inputOut = myCommandLine.args.inputOut
-    if myCommandLine.args.inputMFE:
-        inputMFE = myCommandLine.args.inputMFE
     if myCommandLine.args.inputFa:
         inputFa = myCommandLine.args.inputFa
-    if myCommandLine.args.inputGFF:
-        inputGFF = myCommandLine.args.inputGFF
-    if myCommandLine.args.chromLengths:
-        chromLengths = myCommandLine.args.chromLengths
+    if myCommandLine.args.inputMFE:
+        inputMFE = myCommandLine.args.inputMFE
     if myCommandLine.args.trainingFile:
         trainingFile = myCommandLine.args.trainingFile
+
+    # Files that we can deal with not having:
+    if myCommandLine.args.phastConsElements:
+        phastConsElements = myCommandLine.args.phastConsElements
+    else:
+        phastConsElements = ''
+
+    if myCommandLine.args.inputWig:
+        inputWig = myCommandLine.args.inputWig
+    else:
+        inputWig = ''
+
+    if myCommandLine.args.inputGFF:
+        inputGFF = myCommandLine.args.inputGFF
+    else:
+        inputGFF = ''
+
+    if myCommandLine.args.chromLengths:
+        chromLengths = myCommandLine.args.chromLengths
+    else:
+        chromLengths = ''
+
+    if myCommandLine.args.activityFile:
+        activityFile = myCommandLine.args.activityFile
+    else:
+        activityFile = ''
+
+    if myCommandLine.args.segDups:
+        segDups = myCommandLine.args.segDups
+    else:
+        segDups = ''
+
+    # Flag for simplified version (no annotation/aligment) or not:
+    if myCommandLine.args.simplified:
+        simplified = True
+    else:
+        simplified = False
+
+    # Specify output file
+    # If nothing input by user, take .out tRNA file and add "tRNAPredictions" to that
     if myCommandLine.args.outputFile:
         outputFile = myCommandLine.args.outputFile
     if len(outputFile) == 0:
         outputFile = inputOut.split('.')[0]+'tRNAPredictions.out'
 
-    myFileConverter = fileConverter(inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, trainingFile, outputFile)
+    myFileConverter = fileConverter(inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, trainingFile, activityFile, segDups, outputFile)
     myFileConverter.getFeatures()
 
 if __name__ == "__main__":
