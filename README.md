@@ -63,7 +63,7 @@ Here is a general guide to the program in the listed order. All commands ending 
 `./species-name-getAlign.sh (generated in step 8)`
 
 ##### 13: classify tRNA genes using data created earlier in the pipeline and human training data:
-`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_250.bed -c phastConsElements.txt -w tRNA.wig -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -g gff.bed -l chrom_lengths.txt -d human_training_data.tsv -o /out/path/tRNAClassifications.out`
+`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_250.bed -c phastConsElements.txt -w tRNA.wig -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -g gff.bed -l chrom_lengths.txt -d humanTrainingData.tsv -o /out/path/tRNAClassifications.out`
 
 ### <a name="guide"></a>Simplified Version:
 
@@ -75,7 +75,7 @@ You might be wondering what to do if you have no Cactus graph, or annotation for
 `tRNAscan-SE genome.fa -o tRNA.out -f tRNA.ss -s tRNA.iso -m tRNA.stats -b tRNA.bed -a tRNA.fa -H -y --detail`
 `EukHighConfidenceFilter -r -i tRNA.out -s tRNA.ss -p tRNA_hiConf -o /out/path/filename`
 ##### 2: create .bed files of high-confidence tRNAs, .fa of tRNA genes and flanking regions, and shell script to create and analyze data:
-`python makeHiConfBed.py -i tRNA_hiConf.out -b tRNA.bed -s species-name -c /path/to/cactus/graph -m /mod/file/from/step-5 (-l chromosome_lengths.txt) -o /out/path/filename`
+`python makeHiConfBed.py -i tRNA_hiConf.out -b tRNA.bed -s species-name -c  -m (-l chromosome_lengths.txt) -o /out/path/filename`
 
 ##### 3: create a .fa file containing the tRNA gene and its 250 flanks on either side:
 `python tRNAFasta.py -b tRNA_hiConf_250.bed -g genome.fa -o /out/path/filename`
@@ -84,8 +84,8 @@ You might be wondering what to do if you have no Cactus graph, or annotation for
 ##### 5: run RNAfold to determine MFE for each tRNA gene:
 `RNAfold --noPS -C < /out/from/step-10.txt > tRNA.mfe`
 
-##### 13: classify tRNA genes using simplified flag (-x) and alternate training data set.:
-`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_250.bed -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -l chrom_lengths.txt -d human_simplified_training_data.tsv -o /out/path/tRNAClassifications.out -x`
+##### 6: classify tRNA genes using simplified flag (-x) and alternate training data set.:
+`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_250.bed -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -l chrom_lengths.txt -d humanSimplifiedTrainingData.tsv -o /out/path/tRNAClassifications.out -x`
 
 
 ### <a name="what"></a>What's in this repository:
@@ -95,6 +95,7 @@ You might be wondering what to do if you have no Cactus graph, or annotation for
 - `gff2bed.py` -- converts .gff file to .bed format containing only exons.
 - `reduce4d.py` -- converts .bed file output by hal4dExtract to a .bed containing only the 4d sites of 100,000 randomly distributed exons.
 - `humanTrainingData.tsv` -- tRNA data derived from these methods performed on the hg38 genome.
+- `humanSimplifiedTrainingData.tsv` -- tRNA data derived from the simplified methods performed on the hg38 genome.
 - `classifytRNAs.py` -- gathers PhyloP scores, tRNAscan-SE bit scores, MFE, CpG content, distance to protein-coding genes for each tRNA gene, and uses analogous data and labels from human data to predict activity states for each tRNA in the genome of interest. Outputs tRNAPredictions.out, which contains the name of each tRNA, its predicted activity, and the probability scores as determined by sklearn.
 
 ### <a name="contact"></a>Contact:
