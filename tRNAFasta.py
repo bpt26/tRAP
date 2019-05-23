@@ -78,6 +78,8 @@ class fileConverter(object):
                             tRNAToSeq[str(tRNA[2])] = revComp(currentChrom[(tRNA[0]):(tRNA[1])])
 
                 myChrom = stripLine[1:]
+                if ' ' in myChrom:
+                    myChrom = (stripLine.split()[0])[1:]
                 currentChrom = ''
                 mytRNAs = []
                 if myChrom in chromTotRNACoords:
