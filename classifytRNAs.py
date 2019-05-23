@@ -409,6 +409,15 @@ class fileConverter(object):
                     else:
                         tRNAToProt75kb[mytRNA] = 0
 
+        else:
+            for myChrom in chromTotRNAs:
+                for mytRNA in chromTotRNAs[myChrom]:
+                    myStart = int(tRNAToStart[mytRNA].split('__')[1])
+                    myEnd = int(tRNAToEnd[mytRNA].split('__')[1])
+                    (chromTotRNACoords[myChrom]).append(myStart)
+                    (chromTotRNACoords[myChrom]).append(myEnd)
+
+
         for myChrom in chromTotRNAs:
             for mytRNA in chromTotRNAs[myChrom]:
                 myStart = int(tRNAToStart[mytRNA].split('__')[1])
@@ -434,8 +443,8 @@ class fileConverter(object):
             reducedSetDicts = [tRNATotRNAPhyloPAvg,tRNATo5PhyloPAvg,tRNAToCpGOvrPct]
             reducedSetDicts += [tRNAToObsExpUp,tRNAToGenBit,tRNATotRNA10kb,tRNAToProt75kb,tRNAToTTTT,tRNAToCodon,tRNAToMFE]
         else:
-            reducedSet += ['CpGDensity','ObsExpUp','GenBit','tRNA10kb','TTTT','Codon','MFE']
-            reducedSetDicts = [tRNAToCpGOvrPct,tRNAToObsExpUp,tRNAToGenBit,tRNATotRNA10kb,tRNAToProt75kb,tRNAToTTTT,tRNAToCodon,tRNAToMFE]
+            reducedSet = ['CpGDensity','ObsExpUp','GenBit','tRNA10kb','TTTT','Codon','MFE']
+            reducedSetDicts = [tRNAToCpGOvrPct,tRNAToObsExpUp,tRNAToGenBit,tRNATotRNA10kb,tRNAToTTTT,tRNAToCodon,tRNAToMFE]
 
         tRNAToActivity = {}
         if len(self.activityFile) > 0:

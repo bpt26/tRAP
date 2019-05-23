@@ -85,7 +85,7 @@ You might be wondering what to do if you have no Cactus graph, or annotation for
 `RNAfold --noPS -C < /out/from/step-10.txt > tRNA.mfe`
 
 ##### 6: classify tRNA genes using simplified flag (-x) and alternate training data set.:
-`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_250.bed -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -l chrom_lengths.txt -d humanSimplifiedTrainingData.tsv -o /out/path/tRNAClassifications.out -x`
+`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_250.bed -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -l chrom_lengths.txt -d humanSimplifiedTrainingData.tsv -o /out/path/tRNAClassifications.out -x True`
 
 
 ### <a name="what"></a>What's in this repository:
