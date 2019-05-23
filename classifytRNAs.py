@@ -464,7 +464,13 @@ class fileConverter(object):
                             diction[tRNA] = '?'
                         myOutString += '\t'+str(diction[tRNA])
                     myOutString += '\t'+tRNAToActivity[tRNA]+'\n'
-        open('alltRNADataCpG.tsv', 'w').write(myOutString)
+
+        if self.simplified == False:
+            myOutDataFile = 'alltRNAData.tsv'
+        else:
+            myOutDataFile = 'alltRNADataSimplified.tsv'
+        open(myOutDataFile, 'w').write(myOutString)
+
 
         ###########################
         ###########################
@@ -496,7 +502,7 @@ class fileConverter(object):
         myTestLabels = []
         myTestNames = []
         imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
-        for line in open('alltRNADataCpG.tsv'):
+        for line in open(myOutDataFile):
             splitLine = (line.strip()).split('\t')
             if (splitLine[0]) != 'tRNA':
                 myTestData.append(makeFloat(splitLine[1:-1]))
@@ -612,7 +618,7 @@ def main(myCommandLine=None):
     if len(outputFile) == 0:
         outputFile = inputOut.split('.')[0]+'tRNAPredictions.out'
 
-    myFileConverter = fileConverter(inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, trainingFile, activityFile, segDups, outputFile)
+    myFileConverter = fileConverter(inputBed, inputBedExt, phastConsElements, inputWig, inputOut, inputMFE, inputFa, inputGFF, chromLengths, trainingFile, activityFile, segDups, outputFile, simplified)
     myFileConverter.getFeatures()
 
 if __name__ == "__main__":
