@@ -1,6 +1,6 @@
 # tRNA gene classifier
 
-This program uses DNA data alone to predict tRNA gene expression, using binary (active/inactive) classifications. For more detail, see our manuscript: https://www.biorxiv.org/node/763511.full
+This program uses DNA data alone to predict tRNA gene expression, using binary (active/inactive) classifications. For more detail, see our manuscript: https://www.biorxiv.org/content/10.1101/661942v1
 
 This program was built with a focus on going from a HAL object to tRNA classifications. However, many labs use MAFs instead of HALs, or may have already reduced their HALs to other forms. To handle this, the pipeline has many files to be used in the order given, but any step can be skipped if you already have the file that that step produces.
 
