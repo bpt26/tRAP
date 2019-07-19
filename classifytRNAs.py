@@ -40,7 +40,7 @@ class CommandLine(object):
         self.parser.add_argument("-b", "--inputBed", help="Input .bed"+
             " containing genomic coordinates of all high-confidence tRNA genes.")
         self.parser.add_argument("-e", "--inputBedExt", help="Input .bed containing genomic coordinates of"+
-            " all high-confidence tRNA genes and 250 bases upstream and downstream where possible.")
+            " all high-confidence tRNA genes and 350 bases upstream and downstream where possible.")
         self.parser.add_argument("-c", "--phastConsElements", help="PhastCons elements"+
             " found in or near high-confidence tRNA genes.")
         self.parser.add_argument("-w", "--inputWig", help="Input .wig file containing PhyloP"+
@@ -50,7 +50,7 @@ class CommandLine(object):
         self.parser.add_argument("-m", "--inputMFE", help="Input .mfe"+
             " file containing minimum free-energy scores for all high-confidence tRNA genes.")
         self.parser.add_argument("-f", "--inputFa", help="Input .fa file containing sequences for the regions"+
-            "spanning 250 bases upstream to 250 bases downstream of all high-confidence tRNA genes.")
+            "spanning 350 bases upstream to 350 bases downstream of all high-confidence tRNA genes.")
         self.parser.add_argument("-g", "--inputGFF", help="Input gff file in .bed format containing all exons"+
             " annotated in the genome of interest.")
         self.parser.add_argument("-l", "--chromLengths", help="Optional but recommended: File containing lengths"+
@@ -360,7 +360,7 @@ class fileConverter(object):
             if 'TTTT' in myDown:
                 tRNAToTTTT[mytRNA] = myDown.index('TTTT')
             else:
-                tRNAToTTTT[mytRNA] = 251
+                tRNAToTTTT[mytRNA] = len(myDown)+1
 
 
         ##################################

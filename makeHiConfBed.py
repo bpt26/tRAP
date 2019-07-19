@@ -82,7 +82,7 @@ class fileConverter(object):
 
         myOutString = ''
         myOutString50 = ''
-        myOutString250 = ''
+        myOutString350 = ''
         chromToOut = {}
 
         for line in open(self.bedFile):
@@ -96,21 +96,21 @@ class fileConverter(object):
 
                 if splitLine[0] in chromToLengths:
                     (chromToOut[splitLine[0]]).append(makeNewLineAdd(splitLine,chromToLengths[splitLine[0]],50)+'\n')
-                    myOutString50 += makeNewLineAdd(splitLine,chromToLengths[splitLine[0]],50)+'\n'
-                    myOutString250 += makeNewLineAdd(splitLine,chromToLengths[splitLine[0]],250)+'\n'
+                    myOutString50 += makeNewLineAdd(splitLine,chromToLengths[splitLine[0]],0)+'\n'
+                    myOutString350 += makeNewLineAdd(splitLine,chromToLengths[splitLine[0]],300)+'\n'
                 else:
                     (chromToOut[splitLine[0]]).append(makeNewLineAdd(splitLine,99999999999999,50)+'\n')
-                    myOutString50 += makeNewLineAdd(splitLine,99999999999999,50)+'\n'
-                    myOutString250 += makeNewLineAdd(splitLine,99999999999999,250)+'\n'
+                    myOutString50 += makeNewLineAdd(splitLine,99999999999999,0)+'\n'
+                    myOutString350 += makeNewLineAdd(splitLine,99999999999999,300)+'\n'
 
         open(self.outPath+'.bed', 'w').write(myOutString)
         open(self.outPath+'50.bed', 'w').write(myOutString50)
-        open(self.outPath+'250.bed', 'w').write(myOutString250)
+        open(self.outPath+'350.bed', 'w').write(myOutString350)
 
         myCommands = '#!/bin/bash\n#$ -cwd\n#$ -j y\n#$ -S /bin/bash\n\nmkdir chromWigs\nmkdir chromElements\n'
         for chrom in sorted(chromToOut.keys()):
             # unfortunately haven't found a way around just running as 
-            myCommands += 'rm *temp*\nrm *Temp*\nhal2maf --refGenome '+self.speciesName
+            myCommands += 'rm *temp*\nrm *Temp*\npython sortBeds.py '+chrom+'.bed\nhal2maf --refGenome '+self.speciesName
             myCommands += ' --refTargets '+chrom+'.bed '+self.cactusPath+' '+chrom+'.maf\n'
             myCommands += 'phyloP --msa-format MAF --method LRT --wig-scores --mode CONACC --no-prune '+self.modFile
             myCommands += ' '+chrom+'.maf > chromWigs/'+chrom+'.wig\nphastCons '+chrom+'.maf '+self.modFile+' --msa-format MAF --viterbi '
