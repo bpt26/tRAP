@@ -32,25 +32,25 @@ Here is a general guide to the program in the listed order. All commands ending 
 
 ### <a name="guide"></a>Step-by-step Guide:
 
-##### 1: convert .gff annotation file to .bed:
-`python gff2bed.py -i annotation.gff -o /out/path/filename`
-##### 2: find four-fold degenerate sites to be used as neutral regions to train PhyloP model:
-`hal4dExtract /path/to/hal-file species-name annotation.bed /out/path/filename`
-##### 3: (optional, recommended for large genomes) subsample down to the 4d sites of 100,000 exons to speed up PhyloP training process:
-`python reduce4d.py -i 4d.bed -n num-exons-to-keep -o /out/path/filename`
-##### 4: convert 4d .bed file to .maf format:
-`hal2mafMP.py --numProc 10 --refGenome species-name --refTargets 4dreduced.bed /path/to/hal-file /out/path/filename`
-`cat /out/path/filename-from-previous-step* > 4dreduced.maf`
-##### 5: use PhyloFit to train model and produce .mod file:
-`phyloFit --EM --tree newick-tree-from-hal-file --msa-format MAF --precision MED --subst-mod REV --out-root /out/path/filename 4dreduced.maf`
-
-##### 6: extract genome from HAL alignment
+##### 1: extract genome from HAL alignment
 `hal2fasta /path/to/hal-file species-name > genome.fa`
-##### 7: use tRNAscan-SE 2.0 to find and annotate tRNA genes, and filter out pseudogenes and low-confidence genes
+##### 2: use tRNAscan-SE 2.0 to find and annotate tRNA genes, and filter out pseudogenes and low-confidence genes
 `tRNAscan-SE genome.fa -o tRNA.out -f tRNA.ss -s tRNA.iso -m tRNA.stats -b tRNA.bed -a tRNA.fa -H -y --detail`
 `EukHighConfidenceFilter -r -i tRNA.out -s tRNA.ss -p tRNA_hiConf -o /out/path/filename`
-##### 8: create .bed files of high-confidence tRNAs, .fa of tRNA genes and flanking regions, and shell script to create and analyze data:
+##### 3: create .bed files of high-confidence tRNAs, .fa of tRNA genes and flanking regions, and shell script to create and analyze data:
 `python makeHiConfBed.py -i tRNA_hiConf.out -b tRNA.bed -s species-name -c /path/to/cactus/graph -m /mod/file/from/step-5 (-l chromosome_lengths.txt) -o /out/path/filename`
+
+##### 4: convert .gff annotation file to .bed:
+`python gff2bed.py -i annotation.gff -o /out/path/filename`
+##### 5: find four-fold degenerate sites to be used as neutral regions to train PhyloP model:
+`hal4dExtract /path/to/hal-file species-name annotation.bed /out/path/filename`
+##### 6: (optional, recommended for large genomes) subsample down to the 4d sites of 100,000 exons to speed up PhyloP training process:
+`python reduce4d.py -i 4d.bed -n num-exons-to-keep -o /out/path/filename`
+##### 7: convert 4d .bed file to .maf format:
+`hal2mafMP.py --numProc 10 --refGenome species-name --refTargets 4dreduced.bed /path/to/hal-file /out/path/filename`
+`cat /out/path/filename-from-previous-step* > 4dreduced.maf`
+##### 8: use PhyloFit to train model and produce .mod file:
+`phyloFit --EM --tree newick-tree-from-hal-file --msa-format MAF --precision MED --subst-mod REV --out-root /out/path/filename 4dreduced.maf`
 
 ##### 9: create a .fa file containing the tRNA gene and its 350 flanks on either side:
 `python tRNAFasta.py -b tRNA_hiConf_350.bed -g genome.fa -o /out/path/filename`
@@ -93,6 +93,7 @@ You might be wondering what to do if you have no Cactus graph, or annotation for
 - `getMFE.py` -- uses tRNAscan-SE secondary structure file and converts to a form usable by RNAfold. Also produces bash script `tRNAfold.sh` that will call RNAfold on this same file.
 - `tRNAFasta.py` -- takes in a bed file and genome-wide .fa file and outputs the sequence in .fa format corresponding to the bed file.
 - `gff2bed.py` -- converts .gff file to .bed format containing only exons.
+- `sortBeds.py` -- ensures that all .bed files are sorted, as hal2maf will ignore all out-of-order lines.
 - `reduce4d.py` -- converts .bed file output by hal4dExtract to a .bed containing only the 4d sites of 100,000 randomly distributed exons.
 - `humanTrainingData.tsv` -- tRNA data derived from these methods performed on the hg38 genome.
 - `humanSimplifiedTrainingData.tsv` -- tRNA data derived from the simplified methods performed on the hg38 genome.
