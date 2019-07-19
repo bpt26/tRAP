@@ -1,6 +1,6 @@
 # tRNA gene classifier
 
-This program uses DNA data alone to predict tRNA gene expression, using binary (active/inactive) classifications. For more detail, see our manuscript: https://www.biorxiv.org/content/10.1101/661942v1
+This program uses DNA data alone to predict tRNA gene expression, using binary (active/inactive) classifications. The premise of this project was based heavily on the observations made in this study: https://www.pnas.org/content/115/36/8996. A separate manuscript focused on the development of this classifier will be posted on bioRxiv very soon.
 
 This program was built with a focus on going from a HAL object to tRNA classifications. However, many labs use MAFs instead of HALs, or may have already reduced their HALs to other forms. To handle this, the pipeline has many files to be used in the order given, but any step can be skipped if you already have the file that that step produces.
 
@@ -8,7 +8,7 @@ By the time you are ready to run the script that makes the actual classification
 - .wig file with PhyloP scores for all bases spanning from 20 bases upstream to 10 bases downstream of each tRNA gene
 - .bed file showing the coordinates of each tRNA gene (from tRNAscan-SE)
 - .out file containing the bit-scores of each tRNA gene (from tRNAscan-SE)
-- .fa file with DNA sequence spanning from 250 bases upstream to 250 bases downstream of each tRNA gene (or to the end of the chromosome/scaffold)
+- .fa file with DNA sequence spanning from 350 bases upstream to 350 bases downstream of each tRNA gene (or to the end of the chromosome/scaffold)
 - RNAfold output showing the minimum free energy for each tRNA gene
 - .bed file containing the locations of annotated protein coding genes in your genome of interest
 
@@ -26,7 +26,7 @@ You can download tRNAscan-SE at http://lowelab.ucsc.edu/tRNAscan-SE/. You can al
 
 ### <a name="overview"></a>Graphical Overview:
 
-<img src='classifierPipelineEdit.png' alt='classifier pipeline' width='910'/>
+<img src='new_full_pipeline.pdf' alt='classifier pipeline' width='910'/>
 
 Here is a general guide to the program in the listed order. All commands ending in .py are custom programs that can be found in this repository. The rest are either functions of HAL, PHAST or tRNAscan-SE:
 
@@ -52,8 +52,8 @@ Here is a general guide to the program in the listed order. All commands ending 
 ##### 8: create .bed files of high-confidence tRNAs, .fa of tRNA genes and flanking regions, and shell script to create and analyze data:
 `python makeHiConfBed.py -i tRNA_hiConf.out -b tRNA.bed -s species-name -c /path/to/cactus/graph -m /mod/file/from/step-5 (-l chromosome_lengths.txt) -o /out/path/filename`
 
-##### 9: create a .fa file containing the tRNA gene and its 250 flanks on either side:
-`python tRNAFasta.py -b tRNA_hiConf_250.bed -g genome.fa -o /out/path/filename`
+##### 9: create a .fa file containing the tRNA gene and its 350 flanks on either side:
+`python tRNAFasta.py -b tRNA_hiConf_350.bed -g genome.fa -o /out/path/filename`
 ##### 10: create an input file to be analyzed by RNAfold:
 `python getMFE.py -s tRNA_hiConf.ss -b tRNA_hiConf.bed -o /out/path/filename`
 ##### 11: run RNAfold to determine MFE for each tRNA gene:
@@ -63,13 +63,13 @@ Here is a general guide to the program in the listed order. All commands ending 
 `./species-name-getAlign.sh (generated in step 8)`
 
 ##### 13: classify tRNA genes using data created earlier in the pipeline and human training data:
-`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_250.bed -c phastConsElements.txt -w tRNA.wig -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -g gff.bed -l chrom_lengths.txt -d humanTrainingData.tsv -o /out/path/tRNAClassifications.out`
+`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_350.bed -c phastConsElements.txt -w tRNA.wig -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_350.fa -g gff.bed -l chrom_lengths.txt -d humanTrainingData.tsv -o /out/path/tRNAClassifications.out`
 
 ### <a name="guide"></a>Simplified Version:
 
 You might be wondering what to do if you have no Cactus graph, or annotation for your tRNA gene set of interest. To handle this case, we have introduced a simplified version of the pipeline. Here, you would just do steps 7, 8, 9, 10, 11 and 13 from above. For simplicity, this version is outlined below:
 
-<img src='classifierPipelineSimplified.png' alt='simplified classifier pipeline' width='910'/>
+<img src='new_simplified_pipeline.pdf' alt='simplified classifier pipeline' width='910'/>
 
 ##### 1: use tRNAscan-SE 2.0 to find and annotate tRNA genes, and filter out pseudogenes and low-confidence genes
 `tRNAscan-SE genome.fa -o tRNA.out -f tRNA.ss -s tRNA.iso -m tRNA.stats -b tRNA.bed -a tRNA.fa -H -y --detail`
@@ -77,19 +77,19 @@ You might be wondering what to do if you have no Cactus graph, or annotation for
 ##### 2: create .bed files of high-confidence tRNAs, .fa of tRNA genes and flanking regions, and shell script to create and analyze data:
 `python makeHiConfBed.py -i tRNA_hiConf.out -b tRNA.bed (-l chromosome_lengths.txt) -o /out/path/filename`
 
-##### 3: create a .fa file containing the tRNA gene and its 250 flanks on either side:
-`python tRNAFasta.py -b tRNA_hiConf_250.bed -g genome.fa -o /out/path/filename`
+##### 3: create a .fa file containing the tRNA gene and its 350 flanks on either side:
+`python tRNAFasta.py -b tRNA_hiConf_350.bed -g genome.fa -o /out/path/filename`
 ##### 4: create an input file to be analyzed by RNAfold:
 `python getMFE.py -s tRNA_hiConf.ss -b tRNA_hiConf.bed -o /out/path/filename`
 ##### 5: run RNAfold to determine MFE for each tRNA gene:
 `RNAfold --noPS -C < /out/from/step-4.txt > tRNA.mfe`
 
 ##### 6: classify tRNA genes using simplified flag (-x) and alternate training data set.:
-`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_250.bed -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_250.fa -l chrom_lengths.txt -d humanSimplifiedTrainingData.tsv -o /out/path/tRNAClassifications.out -x True`
+`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_350.bed -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_350.fa -l chrom_lengths.txt -d humanSimplifiedTrainingData.tsv -o /out/path/tRNAClassifications.out -x True`
 
 
 ### <a name="what"></a>What's in this repository:
-- `makeHiConfBed.py` -- creates 3 .bed files of high-confidence tRNA genes, with 0-, 50- and 250-base padding on either side, and a shell script that will convert these to MAFs and then to PhyloP scores and PhastCons elements
+- `makeHiConfBed.py` -- creates 3 .bed files of high-confidence tRNA genes, with 0-, 50- and 350-base padding on either side, and a shell script that will convert these to MAFs and then to PhyloP scores and PhastCons elements
 - `getMFE.py` -- uses tRNAscan-SE secondary structure file and converts to a form usable by RNAfold. Also produces bash script `tRNAfold.sh` that will call RNAfold on this same file.
 - `tRNAFasta.py` -- takes in a bed file and genome-wide .fa file and outputs the sequence in .fa format corresponding to the bed file.
 - `gff2bed.py` -- converts .gff file to .bed format containing only exons.
