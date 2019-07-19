@@ -26,7 +26,7 @@ You can download tRNAscan-SE at http://lowelab.ucsc.edu/tRNAscan-SE/. You can al
 
 ### <a name="overview"></a>Graphical Overview:
 
-<img src='new_full_pipeline.pdf' alt='classifier pipeline' width='910'/>
+<img src='new_full_pipeline.png' alt='classifier pipeline' width='910'/>
 
 Here is a general guide to the program in the listed order. All commands ending in .py are custom programs that can be found in this repository. The rest are either functions of HAL, PHAST or tRNAscan-SE:
 
@@ -69,7 +69,7 @@ Here is a general guide to the program in the listed order. All commands ending 
 
 You might be wondering what to do if you have no Cactus graph, or annotation for your tRNA gene set of interest. To handle this case, we have introduced a simplified version of the pipeline. Here, you would just do steps 7, 8, 9, 10, 11 and 13 from above. For simplicity, this version is outlined below:
 
-<img src='new_simplified_pipeline.pdf' alt='simplified classifier pipeline' width='910'/>
+<img src='new_simplified_pipeline.png' alt='simplified classifier pipeline' width='910'/>
 
 ##### 1: use tRNAscan-SE 2.0 to find and annotate tRNA genes, and filter out pseudogenes and low-confidence genes
 `tRNAscan-SE genome.fa -o tRNA.out -f tRNA.ss -s tRNA.iso -m tRNA.stats -b tRNA.bed -a tRNA.fa -H -y --detail`
