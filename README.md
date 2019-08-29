@@ -1,6 +1,6 @@
 # tRNA gene classifier
 
-This program uses DNA data alone to predict tRNA gene expression, using binary (active/inactive) classifications. The premise of this project was based heavily on the observations made in this study: https://www.pnas.org/content/115/36/8996. A separate manuscript focused on the development of this classifier will be posted on bioRxiv very soon.
+This program uses DNA data alone to predict tRNA gene expression, using binary (active/inactive) classifications. For the corresponding manuscript, see https://www.biorxiv.org/content/10.1101/661942v3
 
 This program was built with a focus on going from a HAL object to tRNA classifications. However, many labs use MAFs instead of HALs, or may have already reduced their HALs to other forms. To handle this, the pipeline has many files to be used in the order given, but any step can be skipped if you already have the file that that step produces.
 
@@ -50,7 +50,7 @@ Here is a general guide to the program in the listed order. All commands ending 
 `hal2mafMP.py --numProc 10 --refGenome species-name --refTargets 4dreduced.bed /path/to/hal-file /out/path/filename`
 `cat /out/path/filename-from-previous-step* > 4dreduced.maf`
 ##### 8: use PhyloFit to train model and produce .mod file:
-`phyloFit --EM --tree newick-tree-from-hal-file --msa-format MAF --precision MED --subst-mod REV --out-root /out/path/filename 4dreduced.maf`
+`phyloFit -eM --tree newick-tree-from-hal-file --msa-format MAF --precision MED --subst-mod REV --out-root /out/path/filename 4dreduced.maf`
 
 ##### 9: create a .fa file containing the tRNA gene and its 350 flanks on either side:
 `python tRNAFasta.py -b tRNA_hiConf_350.bed -g genome.fa -o /out/path/filename`
@@ -63,11 +63,11 @@ Here is a general guide to the program in the listed order. All commands ending 
 `./species-name-getAlign.sh (generated in step 8)`
 
 ##### 13: classify tRNA genes using data created earlier in the pipeline and human training data:
-`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_350.bed -c phastConsElements.txt -w tRNA.wig -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_350.fa -g gff.bed -l chrom_lengths.txt -d humanTrainingData.tsv -o /out/path/tRNAClassifications.out`
+`python classifytRNAs.py -b tRNA_hiConf.bed -e tRNA_hiConf_350.bed -c phastConsElements.txt -w tRNA.wig -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_350.fa -g gff.bed -l chrom_lengths.txt -d humanTrainingData.tsv -o /out/path/tRNAClassifications.out`
 
 ### <a name="guide"></a>Simplified Version:
 
-You might be wondering what to do if you have no Cactus graph, or annotation for your tRNA gene set of interest. To handle this case, we have introduced a simplified version of the pipeline. Here, you would just do steps 7, 8, 9, 10, 11 and 13 from above. For simplicity, this version is outlined below:
+You might be wondering what to do if you have no Cactus graph, or annotation for your tRNA gene set of interest. To handle this case, we have introduced a simplified version of the pipeline. Here, you would just do steps 2, 3, 9, 10, 11 and 13 from above. For simplicity, this version is outlined below:
 
 <img src='new_simplified_pipeline.png' alt='simplified classifier pipeline' width='910'/>
 
@@ -85,7 +85,7 @@ You might be wondering what to do if you have no Cactus graph, or annotation for
 `RNAfold --noPS -C < /out/from/step-4.txt > tRNA.mfe`
 
 ##### 6: classify tRNA genes using simplified flag (-x) and alternate training data set.:
-`python classifytRNAs.py -b tRNA_hiConf.bed --e tRNA_hiConf_350.bed -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_350.fa -l chrom_lengths.txt -d humanSimplifiedTrainingData.tsv -o /out/path/tRNAClassifications.out -x True`
+`python classifytRNAs.py -b tRNA_hiConf.bed -e tRNA_hiConf_350.bed -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_350.fa -l chrom_lengths.txt -d humanSimplifiedTrainingData.tsv -o /out/path/tRNAClassifications.out -x True`
 
 
 ### <a name="what"></a>What's in this repository:
