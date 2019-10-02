@@ -1,0 +1,1 @@
+These files are used to generate Supplemental Tables S5 and S6, after running our simulation pipeline on the different genome assemblies listed in Supplemental Table S4.
