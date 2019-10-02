@@ -1,0 +1,1 @@
+To analyze Pol III ChIP-seq data, we lifted over (if necessary) to accomodate differences between Kutter et al 2011 and the assembly used in the Cactus graph (see Supplemental Table S4). Then we mapped ChIP-seq peaks to tRNA genes using the liftOver files.
