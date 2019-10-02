@@ -1,0 +1,1 @@
+This directory contains scripts and source data used to perform analyses depicted in "Predicting transfer RNA gene activity from sequence and genome context" (https://www.biorxiv.org/content/10.1101/661942v3). Many minor scripts (e.g. those used to create scatterplots or histograms of data) are not included as the production of these is very straightforward.
