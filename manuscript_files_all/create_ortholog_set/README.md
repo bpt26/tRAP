@@ -1,0 +1,1 @@
+To generate ortholog set, run makeMapAll.py, oneToOneMapAll.py, then the matchOrthologSets scripts in order to incorporate ortholog data from Holmes 2018, and then removeSegDupsFromAlignment.py to get rid of species-specific segmental duplications

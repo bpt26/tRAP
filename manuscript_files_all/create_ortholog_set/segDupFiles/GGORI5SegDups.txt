@@ -1,0 +1,4 @@
+000902F_quiver_patched.tRNA1-AsnGTT
+000911F_quiver_patched.tRNA1-AsnGTT
+000962F_quiver_patched.tRNA3-ValAAC
+000962F_quiver_patched.tRNA4-ValAAC

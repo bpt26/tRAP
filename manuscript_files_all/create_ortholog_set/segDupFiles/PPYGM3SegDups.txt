@@ -1,0 +1,10 @@
+000172F_1_6082370_quiver_pilon.tRNA1-GlyCCC
+000179F_1_5733203_quiver_pilon.tRNA4-IleGAT
+000179F_1_5733203_quiver_pilon.tRNA6-IleGAT
+001743F_1_54158_quiver_pilon.tRNA2-GlyCCC
+001743F_1_54158_quiver_pilon.tRNA3-GluTTC
+002330F_1_40042_quiver_pilon.tRNA1-MetCAT
+002330F_1_40042_quiver_pilon.tRNA4-AlaAGC
+002331F_1_40025_quiver_pilon.tRNA1-MetCAT
+002331F_1_40025_quiver_pilon.tRNA5-AlaAGC
+5702_1_67443_quiver_pilon.tRNA4-GluTTC
