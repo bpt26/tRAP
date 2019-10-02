@@ -1,0 +1,1 @@
+The main script to parse the ATAC-Seq data is atactRNA.py. .bed.gz files come from Foissac et al 2018 as cited in the manuscript. We find the mean peak mapping to the region from 250 nucleotides upstream to 250 nucleotides downstream of each tRNA gene.
