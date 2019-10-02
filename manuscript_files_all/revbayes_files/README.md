@@ -1,0 +1,1 @@
+Install RevBayes and use the file fit_revbayes_models.txt to generate probability matrices.

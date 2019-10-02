@@ -1,0 +1,10 @@
+#NEXUS
+
+BEGIN TAXA;
+	DIMENSIONS ntax=10;
+	TAXLABELS  Oryctolagus_cuniculus Heterocephalus_glaber Cavia_porcellus Octodon_degus Chinchilla_lanigera Rattus_norvegicus Mus_musculus Microtus_ochrogaster Jaculus_jaculus Marmota_marmota;
+END;
+
+BEGIN TREES;
+	TREE tree_1 = (Oryctolagus_cuniculus:82.14079889,((Heterocephalus_glaber:43.35847292,(Cavia_porcellus:35.77899950,(Octodon_degus:32.85536467,Chinchilla_lanigera:32.85536467)inode14:2.92363483)inode13:7.57947342)inode11:29.51823524,((((Rattus_norvegicus:20.88741740,Mus_musculus:20.88741740)inode10:11.77620985,Microtus_ochrogaster:32.66362726)inode19:22.13876483,Jaculus_jaculus:54.80239208)inode9:15.74253581,Marmota_marmota:70.54492789)inode22:2.33178026)inode8:9.26409073)root;
+END;

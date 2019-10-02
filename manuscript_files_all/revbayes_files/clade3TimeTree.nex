@@ -1,0 +1,10 @@
+#NEXUS
+
+BEGIN TAXA;
+	DIMENSIONS ntax=10;
+	TAXLABELS  Erinaceus_europaeus Canis_lupus_familiaris Mustela_putorius_furo Equus_caballus Orcinus_orca Bos_taurus Capra_hircus Sus_scrofa Pteropus_alecto Eptesicus_fuscus;
+END;
+
+BEGIN TREES;
+	TREE tree_1 = (Erinaceus_europaeus:89.32381840,((((Canis_lupus_familiaris:45.52834967,Mustela_putorius_furo:45.52834967)inode14:31.69824433,Equus_caballus:77.22659400)inode13:0.52836241,((Orcinus_orca:55.95985310,(Bos_taurus:24.60000000,Capra_hircus:24.60000000)inode11:31.35985310)inode10:6.00613542,Sus_scrofa:61.96598852)inode19:15.78896789)inode9:0.77378567,(Pteropus_alecto:61.66120786,Eptesicus_fuscus:61.66120786)inode22:16.86753423)inode8:10.79507632)root;
+END;

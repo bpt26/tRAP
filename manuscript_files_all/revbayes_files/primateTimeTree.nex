@@ -1,0 +1,10 @@
+#NEXUS
+
+BEGIN TAXA;
+	DIMENSIONS ntax=7;
+	TAXLABELS  Microcebus_murinus Aotus_nancymaae Macaca_mulatta Gorilla_gorilla_gorilla Pan_troglodytes Homo_sapiens Pongo_abelii;
+END;
+
+BEGIN TREES;
+	TREE tree_1 = (Microcebus_murinus:73.83689435,(Aotus_nancymaae:43.15129635,(Macaca_mulatta:29.44154682,((Gorilla_gorilla_gorilla:9.06309552,(Pan_troglodytes:6.65090500,Homo_sapiens:6.65090500)inode14:2.41219052)inode13:6.69907002,Pongo_abelii:15.76216554)inode11:13.67938128)inode10:13.70974953)inode19:30.68559800)root;
+END;

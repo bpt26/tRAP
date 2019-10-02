@@ -1,0 +1,10 @@
+#NEXUS
+
+BEGIN TAXA;
+	DIMENSIONS ntax=29;
+	TAXLABELS  Erinaceus_europaeus Canis_lupus_familiaris Mustela_putorius_furo Equus_caballus Orcinus_orca Bos_taurus Capra_hircus Sus_scrofa Pteropus_alecto Eptesicus_fuscus Oryctolagus_cuniculus Heterocephalus_glaber Cavia_porcellus Octodon_degus Chinchilla_lanigera Rattus_norvegicus Mus_musculus Microtus_ochrogaster Jaculus_jaculus Marmota_marmota Microcebus_murinus Aotus_nancymaae Macaca_mulatta Gorilla_gorilla_gorilla Pan_troglodytes Homo_sapiens Pongo_abelii Dasypus_novemcinctus Chrysochloris_asiatica;
+END;
+
+BEGIN TREES;
+	TREE tree_1 = (((Erinaceus_europaeus:89.32381840,((((Canis_lupus_familiaris:45.52834967,Mustela_putorius_furo:45.52834967)inode14:31.69824433,Equus_caballus:77.22659400)inode13:0.52836241,((Orcinus_orca:55.95985310,(Bos_taurus:24.60000000,Capra_hircus:24.60000000)inode11:31.35985310)inode10:6.00613542,Sus_scrofa:61.96598852)inode19:15.78896789)inode9:0.77378567,(Pteropus_alecto:61.66120786,Eptesicus_fuscus:61.66120786)inode22:16.86753423)inode8:10.79507632)inode6:7.13857077,((Oryctolagus_cuniculus:82.14079889,((Heterocephalus_glaber:43.35847292,(Cavia_porcellus:35.77899950,(Octodon_degus:32.85536467,Chinchilla_lanigera:32.85536467)inode30:2.92363483)inode29:7.57947342)inode27:29.51823524,((((Rattus_norvegicus:20.88741740,Mus_musculus:20.88741740)inode35:11.77620985,Microtus_ochrogaster:32.66362726)inode43:22.13876483,Jaculus_jaculus:54.80239208)inode42:15.74253581,Marmota_marmota:70.54492789)inode40:2.33178026)inode48:9.26409073)inode51:7.68238853,(Microcebus_murinus:73.83689435,(Aotus_nancymaae:43.15129635,(Macaca_mulatta:29.44154682,((Gorilla_gorilla_gorilla:9.06309552,(Pan_troglodytes:6.65090500,Homo_sapiens:6.65090500)inode47:2.41219052)inode39:6.69907002,Pongo_abelii:15.76216554)inode56:13.67938128)inode55:13.70974953)inode61:30.68559800)inode60:15.98629307)inode54:6.63920175)inode38:8.99739162,(Dasypus_novemcinctus:100.50636333,Chrysochloris_asiatica:100.50636333)inode34:4.95341746)root;
+END;

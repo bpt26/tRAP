@@ -1,0 +1,180 @@
+# This is the code used to fit our data to RevBayes models of discrete character evolution.
+# I open a terminal and copy and paste code in as I go.
+
+cd /Users/Bryan/Desktop/classifier/revbayes/projects/cmake
+./rb
+
+###################
+### ALL SPECIES ###
+###################
+
+setwd("/Users/Bryan/Desktop/classifier/")
+morpho <- readDiscreteCharacterData("all_species_matrix.nex")
+mvi = 1
+phylogeny <- readTrees("allSpeciesTimeTree.nex")[1]
+#Q_morpho := fnJC(3)
+rate_pr := phylogeny.treeLength() / 10
+rate_12 ~ dnExponential(rate_pr)
+rate_13 ~ dnExponential(rate_pr)
+rate_21 ~ dnExponential(rate_pr)
+rate_23 ~ dnExponential(rate_pr)
+rate_31 ~ dnExponential(rate_pr)
+rate_32 ~ dnExponential(rate_pr)
+moves[mvi++] = mvScale( rate_12, weight=2 )
+moves[mvi++] = mvScale( rate_13, weight=2 )
+moves[mvi++] = mvScale( rate_21, weight=2 )
+moves[mvi++] = mvScale( rate_23, weight=2 )
+moves[mvi++] = mvScale( rate_31, weight=2 )
+moves[mvi++] = mvScale( rate_32, weight=2 )
+Q_morpho := fnFreeK( [ rate_12, rate_13, rate_21, rate_23, rate_31, rate_32 ], rescale=false )
+rf_prior <- [1,1,1]
+rf ~ dnDirichlet( rf_prior )
+moves[mvi++] = mvBetaSimplex( rf, weight=2 )
+moves[mvi++] = mvDirichletSimplex( rf, weight=2 )
+mu_morpho ~ dnExponential( 1.0 )
+moves[mvi++] = mvScale(mu_morpho,lambda=1, weight=2.0)
+phyMorpho ~ dnPhyloCTMC(tree=phylogeny, branchRates=mu_morpho, Q=Q_morpho, rootFrequencies=rf, type="Standard")
+phyMorpho.clamp(morpho)
+mymodel = model(phylogeny)
+mni = 1
+monitors[mni++] = mnModel(filename="output/mk.log", printgen=10)
+monitors[mni++] = mnScreen(printgen=100)
+monitors[mni++] = mnFile(filename="logs/allSpeciesTreeLog.log", printgen=10, phylogeny)
+monitors[mni++] = mnFile(filename="logs/allSpeciesQLog.log", printgen=10, Q_morpho)
+monitors[mni++] = mnFile(filename="logs/allSpeciesMuLog.log", printgen=10, mu_morpho)
+mymcmc = mcmc(mymodel, monitors, moves, nruns=3, combine="mixed")
+mymcmc.run(generations=10000, tuningInterval=200)
+Q_morpho.getTransitionProbabilities(1.0)
+Q_morpho.getTransitionProbabilities(10.0)
+
+
+################
+### PRIMATES ###
+################
+
+setwd("/Users/Bryan/Desktop/classifier/")
+morpho <- readDiscreteCharacterData("primate_matrix.nex")
+mvi = 1
+phylogeny <- readTrees("primateTimeTree.nex")[1]
+#Q_morpho := fnJC(3)
+rate_pr := phylogeny.treeLength() / 10
+rate_12 ~ dnExponential(rate_pr)
+rate_13 ~ dnExponential(rate_pr)
+rate_21 ~ dnExponential(rate_pr)
+rate_23 ~ dnExponential(rate_pr)
+rate_31 ~ dnExponential(rate_pr)
+rate_32 ~ dnExponential(rate_pr)
+moves[mvi++] = mvScale( rate_12, weight=2 )
+moves[mvi++] = mvScale( rate_13, weight=2 )
+moves[mvi++] = mvScale( rate_21, weight=2 )
+moves[mvi++] = mvScale( rate_23, weight=2 )
+moves[mvi++] = mvScale( rate_31, weight=2 )
+moves[mvi++] = mvScale( rate_32, weight=2 )
+Q_morpho := fnFreeK( [ rate_12, rate_13, rate_21, rate_23, rate_31, rate_32 ], rescale=false )
+rf_prior <- [1,1,1]
+rf ~ dnDirichlet( rf_prior )
+moves[mvi++] = mvBetaSimplex( rf, weight=2 )
+moves[mvi++] = mvDirichletSimplex( rf, weight=2 )
+mu_morpho ~ dnExponential( 1.0 )
+moves[mvi++] = mvScale(mu_morpho,lambda=1, weight=2.0)
+phyMorpho ~ dnPhyloCTMC(tree=phylogeny, branchRates=mu_morpho, Q=Q_morpho, rootFrequencies=rf, type="Standard")
+phyMorpho.clamp(morpho)
+mymodel = model(phylogeny)
+mni = 1
+monitors[mni++] = mnModel(filename="output/mk.log", printgen=10)
+monitors[mni++] = mnScreen(printgen=100)
+monitors[mni++] = mnFile(filename="logs/primateTreeLog.log", printgen=10, phylogeny)
+monitors[mni++] = mnFile(filename="logs/primateQLog.log", printgen=10, Q_morpho)
+monitors[mni++] = mnFile(filename="logs/primateMuLog.log", printgen=10, mu_morpho)
+mymcmc = mcmc(mymodel, monitors, moves, nruns=3, combine="mixed")
+mymcmc.run(generations=10000, tuningInterval=200)
+Q_morpho.getTransitionProbabilities(1.0)
+Q_morpho.getTransitionProbabilities(10.0)
+
+###############
+### CLADE 2 ###
+###############
+
+setwd("/Users/Bryan/Desktop/classifier/")
+morpho <- readDiscreteCharacterData("clade2_matrix.nex")
+mvi = 1
+phylogeny <- readTrees("clade2TimeTree.nex")[1]
+#Q_morpho := fnJC(3)
+rate_pr := phylogeny.treeLength() / 10
+rate_12 ~ dnExponential(rate_pr)
+rate_13 ~ dnExponential(rate_pr)
+rate_21 ~ dnExponential(rate_pr)
+rate_23 ~ dnExponential(rate_pr)
+rate_31 ~ dnExponential(rate_pr)
+rate_32 ~ dnExponential(rate_pr)
+moves[mvi++] = mvScale( rate_12, weight=2 )
+moves[mvi++] = mvScale( rate_13, weight=2 )
+moves[mvi++] = mvScale( rate_21, weight=2 )
+moves[mvi++] = mvScale( rate_23, weight=2 )
+moves[mvi++] = mvScale( rate_31, weight=2 )
+moves[mvi++] = mvScale( rate_32, weight=2 )
+Q_morpho := fnFreeK( [ rate_12, rate_13, rate_21, rate_23, rate_31, rate_32 ], rescale=false )
+rf_prior <- [1,1,1]
+rf ~ dnDirichlet( rf_prior )
+moves[mvi++] = mvBetaSimplex( rf, weight=2 )
+moves[mvi++] = mvDirichletSimplex( rf, weight=2 )
+mu_morpho ~ dnExponential( 1.0 )
+moves[mvi++] = mvScale(mu_morpho,lambda=1, weight=2.0)
+phyMorpho ~ dnPhyloCTMC(tree=phylogeny, branchRates=mu_morpho, Q=Q_morpho, rootFrequencies=rf, type="Standard")
+phyMorpho.clamp(morpho)
+mymodel = model(phylogeny)
+mni = 1
+monitors[mni++] = mnModel(filename="output/mk.log", printgen=10)
+monitors[mni++] = mnScreen(printgen=100)
+monitors[mni++] = mnFile(filename="logs/clade2TreeLog.log", printgen=10, phylogeny)
+monitors[mni++] = mnFile(filename="logs/clade2QLog.log", printgen=10, Q_morpho)
+monitors[mni++] = mnFile(filename="logs/clade2MuLog.log", printgen=10, mu_morpho)
+mymcmc = mcmc(mymodel, monitors, moves, nruns=3, combine="mixed")
+mymcmc.run(generations=10000, tuningInterval=200)
+Q_morpho.getTransitionProbabilities(1.0)
+Q_morpho.getTransitionProbabilities(10.0)
+
+
+
+###############
+### CLADE 3 ###
+###############
+
+setwd("/Users/Bryan/Desktop/classifier/")
+morpho <- readDiscreteCharacterData("clade3_matrix.nex")
+mvi = 1
+phylogeny <- readTrees("clade3TimeTree.nex")[1]
+#Q_morpho := fnJC(3)
+rate_pr := phylogeny.treeLength() / 10
+rate_12 ~ dnExponential(rate_pr)
+rate_13 ~ dnExponential(rate_pr)
+rate_21 ~ dnExponential(rate_pr)
+rate_23 ~ dnExponential(rate_pr)
+rate_31 ~ dnExponential(rate_pr)
+rate_32 ~ dnExponential(rate_pr)
+moves[mvi++] = mvScale( rate_12, weight=2 )
+moves[mvi++] = mvScale( rate_13, weight=2 )
+moves[mvi++] = mvScale( rate_21, weight=2 )
+moves[mvi++] = mvScale( rate_23, weight=2 )
+moves[mvi++] = mvScale( rate_31, weight=2 )
+moves[mvi++] = mvScale( rate_32, weight=2 )
+Q_morpho := fnFreeK( [ rate_12, rate_13, rate_21, rate_23, rate_31, rate_32 ], rescale=false )
+rf_prior <- [1,1,1]
+rf ~ dnDirichlet( rf_prior )
+moves[mvi++] = mvBetaSimplex( rf, weight=2 )
+moves[mvi++] = mvDirichletSimplex( rf, weight=2 )
+mu_morpho ~ dnExponential( 1.0 )
+moves[mvi++] = mvScale(mu_morpho,lambda=1, weight=2.0)
+phyMorpho ~ dnPhyloCTMC(tree=phylogeny, branchRates=mu_morpho, Q=Q_morpho, rootFrequencies=rf, type="Standard")
+phyMorpho.clamp(morpho)
+mymodel = model(phylogeny)
+mni = 1
+monitors[mni++] = mnModel(filename="output/mk.log", printgen=10)
+monitors[mni++] = mnScreen(printgen=100)
+monitors[mni++] = mnFile(filename="logs/clade3TreeLog.log", printgen=10, phylogeny)
+monitors[mni++] = mnFile(filename="logs/clade3QLog.log", printgen=10, Q_morpho)
+monitors[mni++] = mnFile(filename="logs/clade3MuLog.log", printgen=10, mu_morpho)
+mymcmc = mcmc(mymodel, monitors, moves, nruns=3, combine="mixed")
+mymcmc.run(generations=10000, tuningInterval=200)
+Q_morpho.getTransitionProbabilities(1.0)
+Q_morpho.getTransitionProbabilities(10.0)
