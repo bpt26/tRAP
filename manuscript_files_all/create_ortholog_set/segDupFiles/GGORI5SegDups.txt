@@ -1,4 +1,12 @@
+000249F_quiver_patched.tRNA1-GluTTC
+000354F_quiver_patched.tRNA146-AlaAGC
+000354F_quiver_patched.tRNA149-MetCAT
+000354F_quiver_patched.tRNA150-IleAAT
+000354F_quiver_patched.tRNA24-AlaAGC
+000354F_quiver_patched.tRNA27-MetCAT
+000354F_quiver_patched.tRNA28-IleAAT
 000902F_quiver_patched.tRNA1-AsnGTT
 000911F_quiver_patched.tRNA1-AsnGTT
 000962F_quiver_patched.tRNA3-ValAAC
 000962F_quiver_patched.tRNA4-ValAAC
+001079F_quiver_patched.tRNA4-GluTTC
