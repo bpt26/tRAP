@@ -35,14 +35,45 @@ def getDistribs(abb, alignedtRNAs):
     for k in myKeys:
         isoTypeToCounts[k] = [0, 0]
 
+    converter = {}
+    converter['Ananc2'] = 'Aotus_nancymaae'
+    converter['Btaur8'] = 'Bos_taurus'
+    converter['Casia1'] = 'Chrysochloris_asiatica'
+    converter['Cfami3'] = 'Canis_lupus_familiaris'
+    converter['Chirc1'] = 'Capra_hircus'
+    converter['Clani1'] = 'Chinchilla_lanigera'
+    converter['Cporc3'] = 'Cavia_porcellus'
+    converter['Dnove3'] = 'Dasypus_novemcinctus'
+    converter['Ecaba2'] = 'Equus_caballus'
+    converter['Eeuro2'] = 'Erinaceus_europaeus'
+    converter['Efusc1'] = 'Eptesicus_fuscus'
+    converter['Ggori5'] = 'Gorilla_gorilla'
+    converter['Hglab2'] = 'Heterocephalus_glaber'
+    converter['Hsapi38'] = 'Homo_sapiens'
+    converter['Jjacu1'] = 'Jaculus_jaculus'
+    converter['Mmarm2'] = 'Marmota_marmota'
+    converter['Mmula8'] = 'Macaca_mulatta'
+    converter['Mmuri3'] = 'Microcebus_murinus'
+    converter['Mmusc10'] = 'Mus_musculus'
+    converter['Mochr1'] = 'Microtus_ochrogaster'
+    converter['Mputo1'] = 'Mustela_putorius'
+    converter['Ocuni2'] = 'Oryctolagus_cuniculus'
+    converter['Odegu1'] = 'Octodon_degus'
+    converter['Oorca1'] = 'Orcinus_orca'
+    converter['Palec1'] = 'Pteropus_alecto'
+    converter['Ppygm3'] = 'Pongo_abelii'
+    converter['Ptrog5'] = 'Pan_troglodytes'
+    converter['Rnorv6'] = 'Rattus_norvegicus'
+    converter['Sscro11'] = 'Sus_scrofa'
+
     tRNATotal = 0
     tRNAActive = 0
     tRNAInactive = 0
-    myOut = 'anticodonCountBySpeciesNewNoSegDups.txt'
+    myOut = 'anticodonCountBySpeciesNewFixedNoSegDups.txt'
     mySpecies = abb
     tRNATotal = 0
 
-    for line in open(abb.upper()+'/'+abb+'tRNAClassificationsNewNoSegDups.txt'):
+    for line in open(abb.upper()+'/'+abb+'tRNAClassificationsNewFixedNoSegDups.txt'):
         splitLine = (line.strip()).split('\t')
         mytRNAName = splitLine[0]
         if abb+'-'+mytRNAName in alignedtRNAs:
@@ -63,7 +94,7 @@ def getDistribs(abb, alignedtRNAs):
         myOutString = 'species\t'+joiner(sorted(myKeys))+'\ttotal\tactive\tinactive\n'
     else:
         myOutString = ''
-    myOutString += mySpecies
+    myOutString += converter[mySpecies]
     for k in sorted(myKeys):
         myOutString += '\t'+joinerC(isoTypeToCounts[k])
     myOutString += '\t'+str(tRNATotal)+'\t'+str(tRNAActive)+'\t'+str(tRNAInactive)+'\n'
@@ -90,7 +121,7 @@ def joinerC(entry):
 
 def main():
 
-    alignedtRNAs = gettRNAs('oneToOneMapAllSpeciesAugmentMacaqueNoSegDups.txt')
+    alignedtRNAs = gettRNAs('FINAL_ORTHOLOG_SET.txt')
     mySpeciesAbbrevs = ['Hsapi38','Ptrog5','Ggori5','Ppygm3','Mmula8','Ananc2','Mmuri3','Jjacu1','Mochr1','Mmusc10']
     mySpeciesAbbrevs += ['Rnorv6','Hglab2','Cporc3','Clani1','Odegu1','Mmarm2','Ocuni2','Sscro11','Oorca1','Btaur8']
     mySpeciesAbbrevs += ['Chirc1','Ecaba2','Cfami3','Mputo1','Palec1','Efusc1','Eeuro2','Casia1','Dnove3']
