@@ -29,7 +29,7 @@ def removeSegDupsFromAlignment():
 
 	toRemove = []
 	for abb in abbs:
-		for line in open('segDupFiles/'+abb.upper()+'SegDups.txt'):
+		for line in open(abb.upper()+'/segDups8040.txt'):
 			toRemove.append(abb+'-'+line.strip())
 	print(toRemove)
 
