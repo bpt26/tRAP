@@ -1,4 +1,10 @@
 000207F_1_3860304_quiver_pilon.tRNA1-LysTTT
+000239F_1_3216144_quiver_pilon.tRNA10-LeuAAG
+000239F_1_3216144_quiver_pilon.tRNA12-LeuAAG
+000711F_1_164165_quiver_pilon.tRNA3-HisGTG
+000711F_1_164165_quiver_pilon.tRNA8-HisGTG
 000743F_1_147446_quiver_pilon.tRNA1-AsnGTT
 001001F_1_90098_quiver_pilon.tRNA1-AsnGTT
+001042F_1_96888_quiver_pilon.tRNA5-AsnGTT
 002272F_1_37823_quiver_pilon.tRNA1-LysTTT
+002599F_1_32225_quiver_pilon.tRNA1-AsnGTT
