@@ -43,7 +43,7 @@ def buildClassifier():
     myLabels = []
     myHumanNames = []
     imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
-    for line in open('humanCpGTrainingSet.tsv'):
+    for line in open('humanCpGTrainingSetFixed.tsv'):
         splitLine = (line.strip()).split('\t')
         if (splitLine[0]) == 'tRNA':
             myHeader = []
@@ -64,7 +64,7 @@ def buildClassifier():
     myMouseLabels = []
     myMouseNames = []
     imp_mean = SimpleImputer(missing_values=np.nan, strategy='mean')
-    for line in open('mousetRNADataCpG.tsv'):
+    for line in open('mousetRNADataCpGFixed.tsv'):
         splitLine = (line.strip()).split('\t')
         if (splitLine[0]) == 'tRNA':
             myMouseHeader = splitLine
@@ -140,8 +140,6 @@ def buildClassifier():
     open('humanCVPredictionsChanged.txt', 'w').write(myOutString)
 
 
-
-
     
     fig_width = 8
     fig_height = 8
@@ -151,7 +149,6 @@ def buildClassifier():
     panel1 = plt.axes([(1.0-panel_width)/2, (1-panel_height)/2, panel_width, panel_height], frameon=True)
     myColors = ['red','orange','yellow','green','cyan','blue','indigo','violet','brown','pink']
     print(clf.feature_importances_)
-
 
 def reorder(myList, myOrder):
     myReturn = []

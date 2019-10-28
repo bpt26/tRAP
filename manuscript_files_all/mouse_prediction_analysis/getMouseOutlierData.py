@@ -41,7 +41,7 @@ def getMouseOutlierData():
     featureToActiveData = {}
     featureToInactiveData = {}
 
-    for line in open('humanCpGTrainingSet.tsv'):
+    for line in open('humanCpGTrainingSetFixed.tsv'):
         splitLine = (line.strip()).split('\t')
         if splitLine[0] == 'tRNA':
             myHeader = splitLine
@@ -125,7 +125,7 @@ def getMouseOutlierData():
         'NC_000086.7.tRNA606-AlaTGC': 'tRNA-Ala-TGC-5-2',
         'NC_000086.7.tRNA613-AlaTGC': 'tRNA-Ala-TGC-6-1'}
 
-    for line in open('mousetRNADataCpG.tsv'):
+    for line in open('mousetRNADataCpGFixed.tsv'):
         splitLine = (line.strip()).split('\t')
         if splitLine[0] == 'tRNA':
             myOutString = joiner(splitLine)+'\tProbability Score\tExperimental Data\tClassifier Prediction\n'
