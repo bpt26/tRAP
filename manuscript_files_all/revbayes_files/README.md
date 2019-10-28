@@ -1,1 +1,1 @@
-Install RevBayes and use the file fit_revbayes_models.txt to generate probability matrices.
+We installed RevBayes and wrote and ran the file fit_revbayes_models.txt to fit phylogenetic models of discrete character evolution to our data, as well as to generate the transition probability matrices associated with the best-fitting models.

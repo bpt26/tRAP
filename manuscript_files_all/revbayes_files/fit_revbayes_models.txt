@@ -1,6 +1,3 @@
-# This is the code used to fit our data to RevBayes models of discrete character evolution.
-# I open a terminal and copy and paste code in as I go.
-
 cd /Users/Bryan/Desktop/classifier/revbayes/projects/cmake
 ./rb
 
@@ -9,7 +6,7 @@ cd /Users/Bryan/Desktop/classifier/revbayes/projects/cmake
 ###################
 
 setwd("/Users/Bryan/Desktop/classifier/")
-morpho <- readDiscreteCharacterData("all_species_matrix.nex")
+morpho <- readDiscreteCharacterData("allSpeciesMatrix.nex")
 mvi = 1
 phylogeny <- readTrees("allSpeciesTimeTree.nex")[1]
 #Q_morpho := fnJC(3)
@@ -53,7 +50,7 @@ Q_morpho.getTransitionProbabilities(10.0)
 ################
 
 setwd("/Users/Bryan/Desktop/classifier/")
-morpho <- readDiscreteCharacterData("primate_matrix.nex")
+morpho <- readDiscreteCharacterData("primateMatrix.nex")
 mvi = 1
 phylogeny <- readTrees("primateTimeTree.nex")[1]
 #Q_morpho := fnJC(3)
@@ -96,7 +93,7 @@ Q_morpho.getTransitionProbabilities(10.0)
 ###############
 
 setwd("/Users/Bryan/Desktop/classifier/")
-morpho <- readDiscreteCharacterData("clade2_matrix.nex")
+morpho <- readDiscreteCharacterData("clade2Matrix.nex")
 mvi = 1
 phylogeny <- readTrees("clade2TimeTree.nex")[1]
 #Q_morpho := fnJC(3)
@@ -135,13 +132,12 @@ Q_morpho.getTransitionProbabilities(1.0)
 Q_morpho.getTransitionProbabilities(10.0)
 
 
-
 ###############
 ### CLADE 3 ###
 ###############
 
 setwd("/Users/Bryan/Desktop/classifier/")
-morpho <- readDiscreteCharacterData("clade3_matrix.nex")
+morpho <- readDiscreteCharacterData("clade3Matrix.nex")
 mvi = 1
 phylogeny <- readTrees("clade3TimeTree.nex")[1]
 #Q_morpho := fnJC(3)
