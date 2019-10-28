@@ -110,7 +110,7 @@ class fileConverter(object):
         myCommands = '#!/bin/bash\n#$ -cwd\n#$ -j y\n#$ -S /bin/bash\n\nmkdir chromWigs\nmkdir chromElements\n'
         for chrom in sorted(chromToOut.keys()):
             # unfortunately haven't found a way around just running as 
-            myCommands += 'rm *temp*\nrm *Temp*\npython sortBeds.py '+chrom+'.bed\nhal2maf --refGenome '+self.speciesName
+            myCommands += 'rm *temp*\nrm *Temp*\npython ../sortBeds.py '+chrom+'.bed\nhal2maf --refGenome '+self.speciesName
             myCommands += ' --refTargets '+chrom+'.bed '+self.cactusPath+' '+chrom+'.maf\n'
             myCommands += 'phyloP --msa-format MAF --method LRT --wig-scores --mode CONACC --no-prune '+self.modFile
             myCommands += ' '+chrom+'.maf > chromWigs/'+chrom+'.wig\nphastCons '+chrom+'.maf '+self.modFile+' --msa-format MAF --viterbi '
