@@ -111,6 +111,7 @@ class fileConverter(object):
                 chromToLen[splitLine[0]] = int(splitLine[2])
 
         coordToCons = {}
+        if self.simplified == False:
         for line in open(self.phastConsElements):
             splitLine = (line.strip()).split('\t')
             myChrom = splitLine[0]
