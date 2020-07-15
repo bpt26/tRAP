@@ -111,20 +111,20 @@ class fileConverter(object):
                 chromToLen[splitLine[0]] = int(splitLine[2])
 
         coordToCons = {}
-        if self.simplified == False:
-        for line in open(self.phastConsElements):
-            splitLine = (line.strip()).split('\t')
-            myChrom = splitLine[0]
-            if len(chromToLen) != 0 and not myChrom in chromToLen:
-                for i in range(1,10):
-                    if myChrom+'.'+str(i) in chromTotRNAs: 
-                        myChrom = myChrom+'.'+str(i)
-            myStart = int(splitLine[1])
-            myEnd = int(splitLine[2])
-            myScore = int(splitLine[4])
-            if myEnd-myStart <= 100 and myScore >= 200:
-                for k in range(myStart, myEnd+1):
-                    coordToCons[myChrom+'__'+str(k)] = True
+        if self.phastConsElements != '':
+            for line in open(self.phastConsElements):
+                splitLine = (line.strip()).split('\t')
+                myChrom = splitLine[0]
+                if len(chromToLen) != 0 and not myChrom in chromToLen:
+                    for i in range(1,10):
+                        if myChrom+'.'+str(i) in chromTotRNAs: 
+                            myChrom = myChrom+'.'+str(i)
+                myStart = int(splitLine[1])
+                myEnd = int(splitLine[2])
+                myScore = int(splitLine[4])
+                if myEnd-myStart <= 100 and myScore >= 200:
+                    for k in range(myStart, myEnd+1):
+                        coordToCons[myChrom+'__'+str(k)] = True
 
         for line in open(self.inputBed):
             splitLine = (line.strip()).split('\t')
