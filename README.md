@@ -1,4 +1,4 @@
-# tRNA gene classifier
+# tRAP (tRNA Acitivity Predictor)
 
 This program uses DNA data alone to predict tRNA gene expression, using binary (active/inactive) classifications. For the corresponding manuscript, see https://genome.cshlp.org/content/30/1/85.
 
