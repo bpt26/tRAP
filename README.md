@@ -1,6 +1,6 @@
-# tRAP (tRNA Activity Predictor)
+# tRNA gene classifier
 
-This program uses DNA data alone to predict tRNA gene expression, using binary (active/inactive) classifications. For the corresponding publication, see https://www.ncbi.nlm.nih.gov/pubmed/31857444/
+This program uses DNA data alone to predict tRNA gene expression, using binary (active/inactive) classifications. For the corresponding manuscript, see https://genome.cshlp.org/content/30/1/85.
 
 This program was built with a focus on going from a HAL object to tRNA classifications. However, many labs use MAFs instead of HALs, or may have already reduced their HALs to other forms. To handle this, the pipeline has many files to be used in the order given, but any step can be skipped if you already have the file that that step produces.
 
@@ -19,6 +19,7 @@ You can download tRNAscan-SE at http://lowelab.ucsc.edu/tRNAscan-SE/. You can al
 ### Table of Contents
 
 - [Graphical Overview](#overview)
+- [General Usage](#general)
 - [Step-by-step Guide](#guide)
 - [Simplified Version](#simplified)
 - [What's in this repository](#what)
@@ -28,9 +29,21 @@ You can download tRNAscan-SE at http://lowelab.ucsc.edu/tRNAscan-SE/. You can al
 
 <img src='new_full_pipeline.png' alt='classifier pipeline' width='910'/>
 
-Here is a general guide to the program in the listed order. All commands ending in .py are custom programs that can be found in this repository. The rest are either functions of HAL, PHAST or tRNAscan-SE:
+### <a name="general"></a>General Usage:
+
+Until Cactus becomes more widespread, I anticipate that most people reading this will want a quick classification using only a genome sequence. This is nearly as accurate as the full Cactus-based version, much simpler, faster, and robust. To accomodate this, I've added a Snakefile (for information on Snakemake, see <a href="https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html">here</a>). To use the Snakefile, first ensure that you've run tRNAscan-SE and EukHighConfidenceFilter on your data (or downloaded these results from gtrnadb.ucsc.edu), and ensure that in your working directory, you have the following files, named in the following way:
+
+##### {root_name}.fa (whole genome sequence in FASTA format)
+##### {root_name}.chrom.sizes (downloadable for most species from https://hgdownload.soe.ucsc.edu/goldenPath/)
+##### {root_name}-tRNAs.bed (output by tRNAscan-SE)
+##### {root_name}-tRNAs-confidence-set.out (output by tRNAscan-SE)
+##### {root_name}-tRNAs-confidence-set.ss (output by tRNAscan-SE)
+
+Then, simply call `snakemake {root_name}tRNAScores.txt`. For more details on this process, see the [Simplified Version](#simplified) section.
 
 ### <a name="guide"></a>Step-by-step Guide:
+
+Here is a general guide to the program in the listed order. All commands ending in .py are custom programs that can be found in this repository. The rest are either functions of HAL, PHAST or tRNAscan-SE:
 
 ##### 1: extract genome from HAL alignment
 `hal2fasta /path/to/hal-file species-name > genome.fa`
