@@ -18,16 +18,12 @@ You can download tRNAscan-SE at http://lowelab.ucsc.edu/tRNAscan-SE/. You can al
 
 ### Table of Contents
 
-- [Graphical Overview](#overview)
 - [General Usage](#general)
+- [Graphical Overview](#overview)
 - [Step-by-step Guide](#guide)
 - [Simplified Version](#simplified)
 - [What's in this repository](#what)
 - [Contact](#contact)
-
-### <a name="overview"></a>Graphical Overview:
-
-<img src='new_full_pipeline.png' alt='classifier pipeline' width='910'/>
 
 ### <a name="general"></a>General Usage:
 
@@ -40,6 +36,10 @@ Until Cactus becomes more widespread, I anticipate that most people reading this
 ##### {root_name}-tRNAs-confidence-set.ss (output by tRNAscan-SE)
 
 Then, simply call `snakemake {root_name}tRNAScores.txt`. For more details on this process, see the [Simplified Version](#simplified) section.
+
+### <a name="overview"></a>Graphical Overview:
+
+<img src='new_full_pipeline.png' alt='classifier pipeline' width='910'/>
 
 ### <a name="guide"></a>Step-by-step Guide:
 
@@ -78,7 +78,7 @@ Here is a general guide to the program in the listed order. All commands ending 
 ##### 13: classify tRNA genes using data created earlier in the pipeline and human training data:
 `python classifytRNAs.py -b tRNA_hiConf.bed -e tRNA_hiConf_350.bed -c phastConsElements.txt -w tRNA.wig -t tRNA_hiConf.out -m tRNA.mfe -f tRNA_hiConf_350.fa -g gff.bed -l chrom_lengths.txt -d humanTrainingData.tsv -o /out/path/tRNAClassifications.out`
 
-### <a name="guide"></a>Simplified Version:
+### <a name="simplified"></a>Simplified Version:
 
 You might be wondering what to do if you have no Cactus graph, or annotation for your tRNA gene set of interest. To handle this case, we have introduced a simplified version of the pipeline. Here, you would just do steps 2, 3, 9, 10, 11 and 13 from above. For simplicity, this version is outlined below:
 
