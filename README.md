@@ -29,11 +29,11 @@ You can download tRNAscan-SE at http://lowelab.ucsc.edu/tRNAscan-SE/. You can al
 
 Until Cactus becomes more widespread, I anticipate that most people reading this will want a quick classification using only a genome sequence. This is nearly as accurate as the full Cactus-based version, much simpler, faster, and robust. To accomodate this, I've added a Snakefile (for information on Snakemake, see <a href="https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html">here</a>). To use the Snakefile, first ensure that you've run tRNAscan-SE and EukHighConfidenceFilter on your data (or downloaded these results from gtrnadb.ucsc.edu), and ensure that in your working directory, you have the following files, named in the following way:
 
-##### {root_name}.fa (whole genome sequence in FASTA format)
-##### {root_name}.chrom.sizes (downloadable for most species from https://hgdownload.soe.ucsc.edu/goldenPath/)
-##### {root_name}-tRNAs.bed (output by tRNAscan-SE)
-##### {root_name}-tRNAs-confidence-set.out (output by tRNAscan-SE)
-##### {root_name}-tRNAs-confidence-set.ss (output by tRNAscan-SE)
+- {root_name}.fa (whole genome sequence in FASTA format)
+- {root_name}.chrom.sizes (downloadable for most species from https://hgdownload.soe.ucsc.edu/goldenPath/)
+- {root_name}-tRNAs.bed (output by tRNAscan-SE)
+- {root_name}-tRNAs-confidence-set.out (output by tRNAscan-SE)
+- {root_name}-tRNAs-confidence-set.ss (output by tRNAscan-SE)
 
 Then, simply call `snakemake {root_name}tRNAScores.txt`. For more details on this process, see the [Simplified Version](#simplified) section.
 
