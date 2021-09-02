@@ -1,6 +1,6 @@
 # tRAP (tRNA Activity Predictor)
 
-<a href="https://users.soe.ucsc.edu/~bpt26/tRAP_data.html">Predictions for 29 placental mammal species available here!</a>
+## <a href="https://users.soe.ucsc.edu/~bpt26/tRAP_data.html">Predictions for 29 placental mammal species available here!</a>
 
 This program uses DNA data alone to predict tRNA gene expression, using binary (active/inactive) classifications. For the corresponding manuscript, see https://genome.cshlp.org/content/30/1/85.
 
