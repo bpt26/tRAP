@@ -1,5 +1,7 @@
 # tRAP (tRNA Activity Predictor)
 
+<a href="https://users.soe.ucsc.edu/~bpt26/tRAP_data.html">Predictions for 29 placental mammal species available here!</a>
+
 This program uses DNA data alone to predict tRNA gene expression, using binary (active/inactive) classifications. For the corresponding manuscript, see https://genome.cshlp.org/content/30/1/85.
 
 This program was built with a focus on going from a HAL object to tRNA classifications. However, many labs use MAFs instead of HALs, or may have already reduced their HALs to other forms. To handle this, the pipeline has many files to be used in the order given, but any step can be skipped if you already have the file that that step produces.
